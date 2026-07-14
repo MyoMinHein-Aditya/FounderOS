@@ -9,6 +9,7 @@ function Goals(){
     const [goals,setGoals] = useState([]);
     const [startups,setStartups] = useState([]);
     const [form, setForm] = useState({title:"",description:"",startup_id:""});
+    const [loadingGoalId, setLoadingGoalId] = useState(null);
     
     async function loadGoals(){
         const res = await api.get("/goal/get_my_goals",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
@@ -35,6 +36,22 @@ function Goals(){
     async function finishGoal(goalId){
         await api.patch(`/goal/${goalId}/finish_goal`, {}, {headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
         loadGoals();
+    }
+
+    async function generateTasks(goalId) {
+        setLoadingGoalId(goalId);
+        try {
+            const token = localStorage.getItem("token");
+            const res = await api.post(`/task/generate_from_goal/${goalId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert(`✨ AI Co-founder broke down this goal: Created ${res.data.tasks.length} new tasks! Go to the Tasks page to view them.`);
+        } catch (err) {
+            console.error(err);
+            alert("⚠️ Failed to generate tasks. Please ensure your Groq API key is valid.");
+        } finally {
+            setLoadingGoalId(null);
+        }
     }
 
     return (
@@ -103,12 +120,28 @@ function Goals(){
                                         </div>
                                         
                                         {goal.status !== "Completed" && (
-                                            <button 
-                                                className="btn-primary w-full mt-auto"
-                                                onClick={()=>finishGoal(goal.id)}
-                                            >
-                                                Complete Goal
-                                            </button>
+                                            <div className="mt-auto flex flex-col gap-2">
+                                                <button 
+                                                    className="w-full px-3 py-2 text-xs font-semibold text-zinc-950 bg-gradient-to-r from-violet-400 to-fuchsia-400 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                                    onClick={() => generateTasks(goal.id)}
+                                                    disabled={loadingGoalId === goal.id}
+                                                >
+                                                    {loadingGoalId === goal.id ? (
+                                                        <>
+                                                            <div className="w-3 h-3 border-2 border-t-zinc-950 border-zinc-500 rounded-full animate-spin"></div>
+                                                            Generating...
+                                                        </>
+                                                    ) : (
+                                                        <>✨ AI Generate Tasks</>
+                                                    )}
+                                                </button>
+                                                <button 
+                                                    className="btn-primary w-full text-xs"
+                                                    onClick={()=>finishGoal(goal.id)}
+                                                >
+                                                    Complete Goal
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 ))}
