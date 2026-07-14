@@ -31,7 +31,16 @@ def db_test():
     db = SessionLocal()
     try:
         db.execute(text("SELECT 1"))
-        return {"status": "success", "message": "Database connection successful!"}
+        dialect = db.bind.dialect.name
+        host = db.bind.url.host or "Local In-Memory"
+        database = db.bind.url.database
+        return {
+            "status": "success",
+            "message": "Database connection successful!",
+            "dialect": dialect,
+            "host": host,
+            "database": database
+        }
     except Exception as e:
         import traceback
         return {
