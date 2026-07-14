@@ -24,6 +24,24 @@ def home():
         "message":"FounderOs backend running"
     }
 
+@app.get("/db-test")
+def db_test():
+    from database.db import SessionLocal
+    from sqlalchemy import text
+    db = SessionLocal()
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "success", "message": "Database connection successful!"}
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
+    finally:
+        db.close()
+
 app.include_router(
     auth_router,
     prefix="/auth",
