@@ -6,6 +6,7 @@ from models.startup import Startup
 from models.goal import Goal
 from schemas.task import TaskCreate
 from utils.auth import get_current_user
+from agents.task_agent import task_agent
 
 router = APIRouter()
 
@@ -53,4 +54,33 @@ def finish_task(task_id: int, db: Session = Depends(get_db), current_user = Depe
     db.commit()
     return {
         "message": "Task Completed"
+    }
+
+@router.post("/generate_from_goal/{goal_id}")
+def generate_tasks_from_goal(goal_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    goal = db.query(Goal).join(Startup).filter(Goal.id == goal_id, Startup.owner_id == current_user["user_id"]).first()
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+        
+    result = task_agent.generate(goal.title)
+    generated_tasks = result.get("tasks", [])
+    
+    created_tasks = []
+    for t_title in generated_tasks:
+        new_task = Task(
+            title = t_title,
+            startup_id = goal.startup_id,
+            goal_id = goal.id,
+            status = "Pending"
+        )
+        db.add(new_task)
+        created_tasks.append(new_task)
+        
+    db.commit()
+    for t in created_tasks:
+        db.refresh(t)
+        
+    return {
+        "message": f"Successfully generated {len(created_tasks)} tasks",
+        "tasks": created_tasks
     }

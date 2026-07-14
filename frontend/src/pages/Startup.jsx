@@ -10,6 +10,7 @@ function Startup(){
     const [startups, setStartups] = useState([]);
     const [form, setForm] = useState({name:"", description:"", stage:"", industry:""});
     const [stats, setStats] = useState({});
+    const [modal, setModal] = useState({ isOpen: false, title: "", content: "", loading: false });
     
     async function loadStartups(){
         const res = await api.get(
@@ -46,6 +47,22 @@ function Startup(){
         alert("Startup Created 🚀");
         setForm({name:"", description:"", stage:"", industry:""});
         loadStartups();
+    }
+
+    async function handleAnalyze(startupId, type) {
+        setModal({ isOpen: true, title: type === "metrics" ? "AI Venture Metrics Analysis" : "AI Strategic Recommendations", content: "", loading: true });
+        try {
+            const token = localStorage.getItem("token");
+            const endpoint = type === "metrics" ? `/startup/${startupId}/analyze` : `/startup/${startupId}/strategy`;
+            const res = await api.get(endpoint, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const content = type === "metrics" ? res.data.analysis : res.data.strategy;
+            setModal(prev => ({ ...prev, content, loading: false }));
+        } catch (err) {
+            console.error(err);
+            setModal(prev => ({ ...prev, content: "⚠️ Failed to fetch AI recommendations. Please check your connection and API key configuration.", loading: false }));
+        }
     }
 
     return (
@@ -136,6 +153,21 @@ function Startup(){
                                                     <ProgressBar percentage={tasksProgress} showPercent={true} />
                                                 </div>
                                             </div>
+                                            
+                                            <div className="border-t border-zinc-800/60 pt-4 mt-4 flex gap-2">
+                                                <button 
+                                                    className="px-2.5 py-1.5 text-[11px] font-semibold text-zinc-300 bg-zinc-900/60 hover:bg-violet-900/10 border border-zinc-800 hover:border-violet-800/50 rounded-lg transition-all flex-1 cursor-pointer"
+                                                    onClick={() => handleAnalyze(startup.id, "metrics")}
+                                                >
+                                                    📊 Metrics Analysis
+                                                </button>
+                                                <button 
+                                                    className="px-2.5 py-1.5 text-[11px] font-semibold text-zinc-300 bg-zinc-900/60 hover:bg-violet-900/10 border border-zinc-800 hover:border-violet-800/50 rounded-lg transition-all flex-1 cursor-pointer"
+                                                    onClick={() => handleAnalyze(startup.id, "strategy")}
+                                                >
+                                                    💡 Strategy Move
+                                                </button>
+                                            </div>
                                         </div>
                                     );
                                 })}
@@ -144,6 +176,44 @@ function Startup(){
                     </section>
                 </div>
             </main>
+
+            {modal.isOpen && (
+                <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="glass-card max-w-2xl w-full max-h-[85vh] flex flex-col p-6 md:p-8 border border-zinc-800/80 bg-zinc-950/95 shadow-2xl rounded-2xl">
+                        <header className="flex justify-between items-center pb-4 border-b border-zinc-900 mb-6">
+                            <h3 className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                                {modal.title}
+                            </h3>
+                            <button 
+                                className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer"
+                                onClick={() => setModal({ ...modal, isOpen: false })}
+                            >
+                                ✕
+                            </button>
+                        </header>
+                        
+                        <div className="flex-1 overflow-y-auto pr-2 text-sm md:text-base leading-relaxed text-zinc-300 space-y-4">
+                            {modal.loading ? (
+                                <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+                                    <div className="w-10 h-10 border-4 border-t-violet-500 border-zinc-800 rounded-full animate-spin mb-4"></div>
+                                    <p className="animate-pulse text-sm">AI co-founder is analyzing details...</p>
+                                </div>
+                            ) : (
+                                <div className="whitespace-pre-wrap">{modal.content}</div>
+                            )}
+                        </div>
+                        
+                        <footer className="mt-6 pt-4 border-t border-zinc-900 flex justify-end">
+                            <button 
+                                className="px-5 py-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-zinc-950 hover:text-white font-bold rounded-xl transition-all duration-200 text-sm cursor-pointer"
+                                onClick={() => setModal({ ...modal, isOpen: false })}
+                            >
+                                Close Report
+                            </button>
+                        </footer>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

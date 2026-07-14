@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.dependencies import get_db
 from schemas.startup import StartupCreate
@@ -6,6 +6,8 @@ from models.startup import Startup
 from models.goal import Goal
 from models.task import Task
 from utils.auth import get_current_user
+from agents.analyst_agent import analyst_agent
+from agents.strategy_agent import strategy_agent
 
 router = APIRouter()
 
@@ -58,3 +60,46 @@ def get_startups(db: Session = Depends(get_db), current_user = Depends(get_curre
         })
 
     return result
+
+@router.get("/{startup_id}/analyze")
+def analyze_startup(startup_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    startup = db.query(Startup).filter(Startup.id == startup_id, Startup.owner_id == current_user["user_id"]).first()
+    if not startup:
+        raise HTTPException(status_code=404, detail="Startup not found")
+    
+    # Compile details
+    goals = db.query(Goal).filter(Goal.startup_id == startup.id).all()
+    tasks = db.query(Task).filter(Task.startup_id == startup.id).all()
+    
+    data = {
+        "name": startup.name,
+        "description": startup.description,
+        "stage": startup.stage,
+        "industry": startup.industry,
+        "goals": [g.title for g in goals],
+        "tasks": [{"title": t.title, "status": t.status} for t in tasks]
+    }
+    
+    analysis = analyst_agent.analyze(str(data))
+    return {"analysis": analysis}
+
+@router.get("/{startup_id}/strategy")
+def strategy_startup(startup_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    startup = db.query(Startup).filter(Startup.id == startup_id, Startup.owner_id == current_user["user_id"]).first()
+    if not startup:
+        raise HTTPException(status_code=404, detail="Startup not found")
+        
+    goals = db.query(Goal).filter(Goal.startup_id == startup.id).all()
+    tasks = db.query(Task).filter(Task.startup_id == startup.id).all()
+    
+    data = {
+        "name": startup.name,
+        "description": startup.description,
+        "stage": startup.stage,
+        "industry": startup.industry,
+        "goals": [g.title for g in goals],
+        "tasks": [{"title": t.title, "status": t.status} for t in tasks]
+    }
+    
+    strategy = strategy_agent.analyze(str(data))
+    return {"strategy": strategy}
