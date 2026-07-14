@@ -10,7 +10,7 @@ FounderOS is an all-in-one startup operating workspace designed for founders to 
 - **Core**: Python 3.14, [FastAPI](https://fastapi.tiangolo.com/)
 - **ORM & Database**: [SQLAlchemy](https://www.sqlalchemy.org/), PostgreSQL
 - **Security**: JWT (Jose), Passlib (Bcrypt)
-- **AI Integrations**: OpenAI SDK (`gpt-4o-mini`)
+- **AI Integrations**: Groq
 
 ### Frontend
 - **Core**: React 18, [Vite](https://vitejs.dev/)
