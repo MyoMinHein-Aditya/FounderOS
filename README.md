@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-```
->>>>>>> d823d0ffec8fdfc74551f885a6b718f86671f66d
 # FounderOS 🚀
 
 FounderOS is an all-in-one startup operating workspace designed for founders to manage venture portfolios, track strategic goals, execute tactical milestone tasks, and consult with specialized AI agents including a strategic AI Co-Founder.
