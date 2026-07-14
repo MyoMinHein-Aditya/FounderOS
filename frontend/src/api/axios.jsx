@@ -7,4 +7,3 @@ if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
 }
 const api = axios.create({ baseURL });
 export default api;
-export default api;
