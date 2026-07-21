@@ -1,11 +1,11 @@
-// Styling status indicators with colors
+// Styling status indicators with minimal monochrome contrast
 
 function Badge({ status, label, icon }) {
     const badgeStyles = {
-        completed: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-        pending: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-        active: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
-        default: "bg-zinc-800/50 text-zinc-300 border border-zinc-700/50"
+        completed: "bg-zinc-900 text-zinc-200 border-zinc-700",
+        pending: "bg-zinc-900/80 text-zinc-400 border-zinc-800",
+        active: "bg-white text-zinc-950 font-bold border-white",
+        default: "bg-zinc-900 text-zinc-300 border-zinc-800"
     };
 
     const style = badgeStyles[status] || badgeStyles.default;

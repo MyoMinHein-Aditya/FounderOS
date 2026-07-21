@@ -2,8 +2,19 @@
 
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased selection:bg-violet-500/30;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #050505;
+    color: #f4f4f5;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Outfit', sans-serif;
+  }
+  
+  ::selection {
+    background-color: #ffffff;
+    color: #000000;
   }
   
   * {
@@ -20,31 +31,43 @@
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-zinc-900/40 backdrop-blur-md border border-zinc-800/60 rounded-2xl shadow-xl hover:border-zinc-700/80 hover:shadow-2xl;
+  /* Minimal Solid Card */
+  .minimal-card, .glass-card {
+    @apply bg-zinc-950 border border-zinc-800/80 rounded-2xl hover:border-zinc-700 transition-all duration-200;
   }
   
-  .glass-input {
-    @apply bg-zinc-950/60 border border-zinc-800/60 hover:border-zinc-700/60 focus:border-violet-500/80 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none;
+  /* Minimal Input Field */
+  .minimal-input, .glass-input {
+    @apply bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 focus:border-zinc-400 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-all duration-200;
   }
   
+  /* High-Contrast White Gradient Primary Button */
   .btn-primary {
-    @apply bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl;
+    @apply bg-gradient-to-r from-white via-zinc-100 to-zinc-300 hover:from-zinc-200 hover:to-zinc-400 text-zinc-950 font-bold py-3 px-6 rounded-xl transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.98];
   }
   
+  /* Solid Minimal Dark Secondary Button */
   .btn-secondary {
-    @apply bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 hover:border-zinc-600/50 text-zinc-100 font-medium py-2 px-4 rounded-lg;
+    @apply bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98];
   }
   
+  /* Minimal Badge */
   .badge {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1;
+    @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 border;
   }
   
+  /* Minimal Progress Bar */
   .progress-bar {
-    @apply w-full bg-zinc-900 rounded-full h-2 overflow-hidden;
+    @apply w-full bg-zinc-900 rounded-full h-2 overflow-hidden border border-zinc-800/50;
   }
   
+  /* Monochrome Silver Gradient Progress Fill */
   .progress-fill {
-    @apply h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-600;
+    @apply h-full rounded-full bg-gradient-to-r from-zinc-400 via-zinc-200 to-white;
+  }
+  
+  /* Monochrome Gradient Heading */
+  .text-gradient {
+    @apply bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent;
   }
 }
