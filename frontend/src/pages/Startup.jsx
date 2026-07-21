@@ -13,18 +13,10 @@ function Startup(){
     const [modal, setModal] = useState({ isOpen: false, title: "", content: "", loading: false });
     
     async function loadStartups(){
-        const res = await api.get(
-            "/startup/get_startups",
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            }
-        );
+        const res = await api.get("/startup/get_startups");
         setStartups(res.data);
         
-        const token = localStorage.getItem("token");
-        const dashRes = await api.get("/dashboard/get_stats", {headers:{Authorization:`Bearer ${token}`}});
+        const dashRes = await api.get("/dashboard/get_stats");
         setStats(dashRes.data);
     }
 
@@ -33,30 +25,19 @@ function Startup(){
     }, []);
 
     async function createStartup(){
-        if(!form.name) {
-            alert("Startup Name is required.");
-            return;
-        }
-        await api.post(
-            "/startup/create",
-            form,
-            {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-            }
-        );
+        if(!form.name) return alert("Startup Name is required.");
+        await api.post("/startup/create", form);
         alert("Startup Created.");
         setForm({name:"", description:"", stage:"", industry:""});
         loadStartups();
     }
 
     async function handleAnalyze(startupId, type) {
-        setModal({ isOpen: true, title: type === "metrics" ? "AI Venture Metrics Analysis" : "AI Strategic Recommendations", content: "", loading: true });
+        const title = type === "metrics" ? "AI Venture Metrics Analysis" : "AI Strategic Recommendations";
+        setModal({ isOpen: true, title, content: "", loading: true });
         try {
-            const token = localStorage.getItem("token");
             const endpoint = type === "metrics" ? `/startup/${startupId}/analyze` : `/startup/${startupId}/strategy`;
-            const res = await api.get(endpoint, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get(endpoint);
             const content = type === "metrics" ? res.data.analysis : res.data.strategy;
             setModal(prev => ({ ...prev, content, loading: false }));
         } catch (err) {
@@ -124,53 +105,44 @@ function Startup(){
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {startups.map((startup) => {
-                                    const goalsProgress = startup.goal_pct || 0;
-                                    const tasksProgress = startup.task_pct || 0;
-                                    
-                                    return (
-                                        <div key={startup.id} className="minimal-card p-6 md:p-8">
-                                            <div className="mb-4">
-                                                <h3 className="text-lg md:text-xl font-bold text-white font-heading mb-2">{startup.name}</h3>
-                                                <p className="text-sm text-zinc-400 mb-3">{startup.description}</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {startup.stage && (
-                                                        <Badge status="active" label={startup.stage} />
-                                                    )}
-                                                    {startup.industry && (
-                                                        <Badge status="default" label={startup.industry} />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="border-t border-zinc-900 pt-4 mt-4">
-                                                <div className="mb-4">
-                                                    <p className="text-xs font-semibold text-zinc-300 mb-2">Goals Progress</p>
-                                                    <ProgressBar percentage={goalsProgress} showPercent={true} />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs font-semibold text-zinc-300 mb-2">Tasks Progress</p>
-                                                    <ProgressBar percentage={tasksProgress} showPercent={true} />
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="border-t border-zinc-900 pt-4 mt-4 flex gap-2">
-                                                <button 
-                                                    className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
-                                                    onClick={() => handleAnalyze(startup.id, "metrics")}
-                                                >
-                                                    Metrics Analysis
-                                                </button>
-                                                <button 
-                                                    className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
-                                                    onClick={() => handleAnalyze(startup.id, "strategy")}
-                                                >
-                                                    Strategy Move
-                                                </button>
+                                {startups.map((startup) => (
+                                    <div key={startup.id} className="minimal-card p-6 md:p-8">
+                                        <div className="mb-4">
+                                            <h3 className="text-lg md:text-xl font-bold text-white font-heading mb-2">{startup.name}</h3>
+                                            <p className="text-sm text-zinc-400 mb-3">{startup.description}</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {startup.stage && <Badge status="active" label={startup.stage} />}
+                                                {startup.industry && <Badge status="default" label={startup.industry} />}
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                        
+                                        <div className="border-t border-zinc-900 pt-4 mt-4">
+                                            <div className="mb-4">
+                                                <p className="text-xs font-semibold text-zinc-300 mb-2">Goals Progress</p>
+                                                <ProgressBar percentage={startup.goal_pct || 0} showPercent={true} />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-semibold text-zinc-300 mb-2">Tasks Progress</p>
+                                                <ProgressBar percentage={startup.task_pct || 0} showPercent={true} />
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="border-t border-zinc-900 pt-4 mt-4 flex gap-2">
+                                            <button 
+                                                className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
+                                                onClick={() => handleAnalyze(startup.id, "metrics")}
+                                            >
+                                                Metrics Analysis
+                                            </button>
+                                            <button 
+                                                className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
+                                                onClick={() => handleAnalyze(startup.id, "strategy")}
+                                            >
+                                                Strategy Move
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </section>
@@ -181,9 +153,7 @@ function Startup(){
                 <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4">
                     <div className="minimal-card max-w-2xl w-full max-h-[85vh] flex flex-col p-6 md:p-8 border border-zinc-800 bg-zinc-950 rounded-2xl">
                         <header className="flex justify-between items-center pb-4 border-b border-zinc-900 mb-6">
-                            <h3 className="text-xl font-bold font-heading text-gradient">
-                                {modal.title}
-                            </h3>
+                            <h3 className="text-xl font-bold font-heading text-gradient">{modal.title}</h3>
                             <button 
                                 className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer"
                                 onClick={() => setModal({ ...modal, isOpen: false })}
@@ -217,4 +187,5 @@ function Startup(){
         </div>
     )
 }
+
 export default Startup;

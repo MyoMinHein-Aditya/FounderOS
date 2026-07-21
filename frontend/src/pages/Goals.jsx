@@ -12,39 +12,33 @@ function Goals(){
     const [loadingGoalId, setLoadingGoalId] = useState(null);
     
     async function loadGoals(){
-        const res = await api.get("/goal/get_my_goals",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        const res = await api.get("/goal/get_my_goals");
         setGoals(res.data);
     }
 
     async function loadStartups(){
-        const res = await api.get("/startup/get_startups",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        const res = await api.get("/startup/get_startups");
         setStartups(res.data);
     }
 
     useEffect(()=>{loadGoals(); loadStartups();},[])
     
     async function createGoal(){
-        if(!form.startup_id){
-            alert("Please select a startup before creating a goal.");
-            return;
-        }
-        await api.post("/goal/create",{...form, startup_id: Number(form.startup_id)},{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        if(!form.startup_id) return alert("Please select a startup before creating a goal.");
+        await api.post("/goal/create", {...form, startup_id: Number(form.startup_id)});
         setForm({title:"",description:"",startup_id:""});
         loadGoals();
     }
 
     async function finishGoal(goalId){
-        await api.patch(`/goal/${goalId}/finish_goal`, {}, {headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        await api.patch(`/goal/${goalId}/finish_goal`);
         loadGoals();
     }
 
     async function generateTasks(goalId) {
         setLoadingGoalId(goalId);
         try {
-            const token = localStorage.getItem("token");
-            const res = await api.post(`/task/generate_from_goal/${goalId}`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.post(`/task/generate_from_goal/${goalId}`);
             alert(`AI Co-founder broke down this goal: Created ${res.data.tasks.length} new tasks! Go to the Tasks page to view them.`);
         } catch (err) {
             console.error(err);
