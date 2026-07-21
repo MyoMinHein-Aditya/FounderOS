@@ -71,3 +71,130 @@
     @apply bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent;
   }
 }
+
+/* ==========================================================================
+   Light Mode Theme Overrides (Whitesmoke background, black text)
+   ========================================================================== */
+html.light body {
+  background-color: whitesmoke !important;
+  color: #09090b !important;
+}
+
+html.light .minimal-card,
+html.light .glass-card {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+  color: #09090b !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light .minimal-input,
+html.light .glass-input {
+  background-color: #ffffff !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+}
+
+html.light .minimal-input::placeholder,
+html.light .glass-input::placeholder {
+  color: #71717a !important;
+}
+
+html.light .minimal-input:focus,
+html.light .glass-input:focus {
+  border-color: #18181b !important;
+}
+
+html.light .btn-primary {
+  background: #09090b !important;
+  color: #ffffff !important;
+}
+
+html.light .btn-primary:hover {
+  background: #27272a !important;
+}
+
+html.light .btn-secondary {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+
+html.light .btn-secondary:hover {
+  background-color: #f4f4f5 !important;
+}
+
+html.light aside {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+}
+
+html.light nav a {
+  color: #52525b !important;
+}
+
+html.light nav a:hover {
+  background-color: #f4f4f5 !important;
+  color: #09090b !important;
+}
+
+html.light nav a.bg-white {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  border-left-color: #09090b !important;
+}
+
+html.light .text-gradient {
+  background: linear-gradient(to right, #09090b, #3f3f46) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.light .badge {
+  background-color: #f4f4f5 !important;
+  border-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+
+html.light .progress-bar {
+  background-color: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+}
+
+html.light .progress-fill {
+  background: linear-gradient(to right, #3f3f46, #09090b) !important;
+}
+
+html.light .text-white,
+html.light .text-zinc-100 {
+  color: #09090b !important;
+}
+
+html.light .text-zinc-200 {
+  color: #18181b !important;
+}
+
+html.light .text-zinc-300 {
+  color: #27272a !important;
+}
+
+html.light .text-zinc-400 {
+  color: #52525b !important;
+}
+
+html.light .bg-zinc-950,
+html.light .bg-black {
+  background-color: whitesmoke !important;
+}
+
+html.light .bg-zinc-900\/60,
+html.light .bg-zinc-900\/40,
+html.light .bg-zinc-900 {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+}
+
+html.light select option {
+  background-color: #ffffff !important;
+  color: #09090b !important;
+}
