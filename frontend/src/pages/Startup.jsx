@@ -44,7 +44,7 @@ function Startup(){
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
             }
         );
-        alert("Startup Created 🚀");
+        alert("Startup Created.");
         setForm({name:"", description:"", stage:"", industry:""});
         loadStartups();
     }
@@ -61,7 +61,7 @@ function Startup(){
             setModal(prev => ({ ...prev, content, loading: false }));
         } catch (err) {
             console.error(err);
-            setModal(prev => ({ ...prev, content: "⚠️ Failed to fetch AI recommendations. Please check your connection and API key configuration.", loading: false }));
+            setModal(prev => ({ ...prev, content: "Failed to fetch AI recommendations. Please check your connection and API key configuration.", loading: false }));
         }
     }
 
@@ -71,7 +71,7 @@ function Startup(){
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        My Startups 🚀
+                        My Startups
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Build and manage your portfolio of ventures.
@@ -107,7 +107,7 @@ function Startup(){
                                 onChange={(e)=>setForm({...form, industry:e.target.value})}
                             />
                             <button 
-                                className="btn-primary w-full mt-2 font-bold" 
+                                className="btn-primary w-full font-bold" 
                                 onClick={createStartup}
                             >
                                 Create Startup
@@ -159,13 +159,13 @@ function Startup(){
                                                     className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
                                                     onClick={() => handleAnalyze(startup.id, "metrics")}
                                                 >
-                                                    📊 Metrics Analysis
+                                                    Metrics Analysis
                                                 </button>
                                                 <button 
                                                     className="px-2.5 py-2 text-[11px] font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-all flex-1 cursor-pointer"
                                                     onClick={() => handleAnalyze(startup.id, "strategy")}
                                                 >
-                                                    💡 Strategy Move
+                                                    Strategy Move
                                                 </button>
                                             </div>
                                         </div>

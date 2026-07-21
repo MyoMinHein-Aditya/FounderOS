@@ -38,7 +38,7 @@ function AI() {
             setMessages(prev => [...prev, { role: "assistant", content: res.data.response }]);
         } catch (err) {
             console.error("Failed to send message:", err);
-            setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Sorry, I encountered an error. Please try again." }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
         } finally {
             setLoading(false);
         }
@@ -62,7 +62,7 @@ function AI() {
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-6 flex flex-col h-full">
                 <header className="mb-6 flex-shrink-0">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        AI Co-Founder ✨
+                        AI Co-Founder
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Get instant, practical strategy and metrics feedback from your AI co-founder.
@@ -74,7 +74,6 @@ function AI() {
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4">
                         {messages.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto">
-                                <div className="text-5xl mb-4">🤖</div>
                                 <h3 className="text-lg font-bold text-white font-heading mb-2">Start a conversation</h3>
                                 <p className="text-sm text-zinc-400 font-medium">
                                     Ask me about your startup ideas, strategy moves, marketing plans, or metrics analysis.

@@ -29,7 +29,6 @@ function Login(){
                         <span className="text-gradient">
                             FounderOS
                         </span>
-                        <span className="ml-2 text-3xl">🚀</span>
                     </h1>
                     <p className="text-zinc-400 text-sm mt-3 font-medium">
                         Sign in to your startup command center
