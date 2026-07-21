@@ -14,12 +14,8 @@ function Navbar(){
     }
 
     async function loadUser() {
-        const token = localStorage.getItem("token");
-        if (!token) return;
         try {
-            const res = await api.get("/auth/me", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get("/auth/me");
             setUser(res.data);
         } catch (err) {
             console.error(err);
@@ -32,9 +28,7 @@ function Navbar(){
         function handleClickOutside(event) {
             if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
                 const triggerButton = document.getElementById("sidebar-trigger");
-                if (triggerButton && triggerButton.contains(event.target)) {
-                    return;
-                }
+                if (triggerButton && triggerButton.contains(event.target)) return;
                 setIsOpen(false);
             }
         }

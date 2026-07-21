@@ -12,18 +12,18 @@ function Tasks(){
     const [form, setForm] = useState({title:"",goal_id:"",startup_id:""});
 
     async function loadStartups(){
-        const res = await api.get("/startup/get_startups",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        const res = await api.get("/startup/get_startups");
         setStartups(res.data);
     }
 
     async function loadGoals(){
-        const res = await api.get("/goal/get_my_goals",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        const res = await api.get("/goal/get_my_goals");
         setGoals(res.data);
     }
 
     async function loadTasks(startupId){
         if(!startupId) return setTasks([]);
-        const res = await api.get(`/task/get_tasks/${startupId}`,{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        const res = await api.get(`/task/get_tasks/${startupId}`);
         setTasks(res.data);
     }
 
@@ -33,21 +33,15 @@ function Tasks(){
     },[])
 
     async function createTask(){
-        if(!form.startup_id){
-            alert("Please select a startup before creating a task.");
-            return;
-        }
-        if(!form.goal_id){
-            alert("Please select a goal before creating a task.");
-            return;
-        }
-        await api.post("/task/create",{title: form.title, startup_id: Number(form.startup_id), goal_id: Number(form.goal_id)},{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        if(!form.startup_id) return alert("Please select a startup before creating a task.");
+        if(!form.goal_id) return alert("Please select a goal before creating a task.");
+        await api.post("/task/create", {title: form.title, startup_id: Number(form.startup_id), goal_id: Number(form.goal_id)});
         setForm({...form, title:"",goal_id:""});
         loadTasks(form.startup_id);
     }
 
     async function finishTask(taskId){
-        await api.patch(`/task/${taskId}/finish_task`, {}, {headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
+        await api.patch(`/task/${taskId}/finish_task`);
         loadTasks(form.startup_id);
     }
 

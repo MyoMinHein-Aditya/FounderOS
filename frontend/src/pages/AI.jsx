@@ -9,11 +9,8 @@ function AI() {
     const messagesEndRef = useRef(null);
 
     async function loadHistory() {
-        const token = localStorage.getItem("token");
         try {
-            const res = await api.get("/chat/history", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get("/chat/history");
             setMessages(res.data);
         } catch (err) {
             console.error("Failed to load chat history:", err);
@@ -24,17 +21,13 @@ function AI() {
         if (e) e.preventDefault();
         if (!input.trim() || loading) return;
 
-        const userMessage = { role: "user", content: input };
-        setMessages(prev => [...prev, userMessage]);
         const currentInput = input;
+        setMessages(prev => [...prev, { role: "user", content: currentInput }]);
         setInput("");
         setLoading(true);
 
-        const token = localStorage.getItem("token");
         try {
-            const res = await api.post("/chat/chat", { message: currentInput }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.post("/chat/chat", { message: currentInput });
             setMessages(prev => [...prev, { role: "assistant", content: res.data.response }]);
         } catch (err) {
             console.error("Failed to send message:", err);

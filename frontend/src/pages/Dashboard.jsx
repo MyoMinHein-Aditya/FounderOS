@@ -11,15 +11,13 @@ function Dashboard(){
     const [userName, setUserName] = useState("");
 
     async function loadStats(){
-        const token = localStorage.getItem("token");
-        const res = await api.get("/dashboard/get_stats", {headers:{Authorization:`Bearer ${token}`}});
+        const res = await api.get("/dashboard/get_stats");
         setData(res.data);
     }
 
     async function loadUser(){
-        const token = localStorage.getItem("token");
         try {
-            const res = await api.get("/auth/me", {headers:{Authorization:`Bearer ${token}`}});
+            const res = await api.get("/auth/me");
             setUserName(res.data.name);
         } catch (err) {
             console.error(err);
@@ -32,8 +30,7 @@ function Dashboard(){
     }, []);
 
     async function finishTask(taskId) {
-        const token = localStorage.getItem("token");
-        await api.patch(`/task/${taskId}/finish_task`, {}, {headers:{Authorization:`Bearer ${token}`}});
+        await api.patch(`/task/${taskId}/finish_task`);
         loadStats();
     }
 

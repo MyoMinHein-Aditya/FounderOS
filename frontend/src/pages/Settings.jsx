@@ -9,9 +9,8 @@ function Settings(){
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
     async function loadUser(){
-        const token = localStorage.getItem("token");
         try {
-            const res = await api.get("/auth/me", {headers:{Authorization:`Bearer ${token}`}});
+            const res = await api.get("/auth/me");
             setUser(res.data);
         } catch (err) {
             console.error(err);
