@@ -14,7 +14,7 @@ function Register(){
         try {
             setLoading(true);
             await api.post("/auth/register",{name,email,password});
-            alert("Registration Successful 🚀 Please login.");
+            alert("Registration Successful. Please login.");
             window.location.href="/";
         } catch (err) {
             alert(err.response?.data?.detail || "Registration Failed");

@@ -45,10 +45,10 @@ function Goals(){
             const res = await api.post(`/task/generate_from_goal/${goalId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert(`✨ AI Co-founder broke down this goal: Created ${res.data.tasks.length} new tasks! Go to the Tasks page to view them.`);
+            alert(`AI Co-founder broke down this goal: Created ${res.data.tasks.length} new tasks! Go to the Tasks page to view them.`);
         } catch (err) {
             console.error(err);
-            alert("⚠️ Failed to generate tasks. Please ensure your Groq API key is valid.");
+            alert("Failed to generate tasks. Please ensure your Groq API key is valid.");
         } finally {
             setLoadingGoalId(null);
         }
@@ -60,7 +60,7 @@ function Goals(){
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Strategic Goals 🎯
+                        Strategic Goals
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Define and validate goals for your startups.
@@ -116,7 +116,7 @@ function Goals(){
                                         <div className="mb-4">
                                             <h3 className="text-lg md:text-xl font-bold text-white font-heading mb-2">{goal.title}</h3>
                                             <p className="text-sm text-zinc-400 mb-3">{goal.description}</p>
-                                            <Badge status={goal.status === "Completed" ? "completed" : "pending"} label={goal.status === "Completed" ? "Completed" : "Pending"} icon={goal.status === "Completed" ? "✅" : "⏳"} />
+                                            <Badge status={goal.status === "Completed" ? "completed" : "pending"} label={goal.status === "Completed" ? "Completed" : "Pending"} />
                                         </div>
                                         
                                         {goal.status !== "Completed" && (
@@ -132,7 +132,7 @@ function Goals(){
                                                             Generating...
                                                         </>
                                                     ) : (
-                                                        <>✨ AI Generate Tasks</>
+                                                        <>AI Generate Tasks</>
                                                     )}
                                                 </button>
                                                 <button 

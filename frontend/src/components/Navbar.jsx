@@ -43,12 +43,12 @@ function Navbar(){
     }, []);
 
     const navItems = [
-        { path: "/dashboard", label: "Dashboard", icon: "📊" },
-        { path: "/startup", label: "Startups", icon: "🚀" },
-        { path: "/goal", label: "Goals", icon: "🎯" },
-        { path: "/task", label: "Tasks", icon: "📋" },
-        { path: "/ai", label: "AI Assistant", icon: "✨" },
-        { path: "/settings", label: "Settings", icon: "⚙️" }
+        { path: "/dashboard", label: "Dashboard" },
+        { path: "/startup", label: "Startups" },
+        { path: "/goal", label: "Goals" },
+        { path: "/task", label: "Tasks" },
+        { path: "/ai", label: "AI Assistant" },
+        { path: "/settings", label: "Settings" }
     ];
 
     const userInitials = user && user.name ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "US";
@@ -80,7 +80,7 @@ function Navbar(){
                 <div>
                     <div className="flex items-center justify-between pb-6 border-b border-zinc-900 mb-6">
                         <span className="text-2xl font-extrabold text-gradient font-heading tracking-tight">
-                            FounderOS 🚀
+                            FounderOS
                         </span>
                         <button 
                             className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer"
@@ -104,7 +104,6 @@ function Navbar(){
                                             : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100'
                                     }`}
                                 >
-                                    <span className="text-base">{item.icon}</span>
                                     <span>{item.label}</span>
                                 </Link>
                             );
@@ -129,7 +128,6 @@ function Navbar(){
                         className="flex items-center gap-3 px-4 py-3 w-full text-sm font-semibold text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 rounded-xl transition-all duration-200 cursor-pointer" 
                         onClick={logout}
                     >
-                        <span className="text-base">🚪</span>
                         <span>Logout</span>
                     </button>
                 </div>

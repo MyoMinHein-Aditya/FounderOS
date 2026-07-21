@@ -59,7 +59,7 @@ function Tasks(){
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Venture Tasks 📋
+                        Venture Tasks
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Execute key milestones and track progress.
@@ -126,7 +126,7 @@ function Tasks(){
                                     <div key={task.id} className="minimal-card p-6 md:p-8 flex flex-col">
                                         <div className="mb-4">
                                             <h3 className="text-lg md:text-xl font-bold text-white font-heading mb-2">{task.title}</h3>
-                                            <Badge status={task.status === "Completed" ? "completed" : "pending"} label={task.status === "Completed" ? "Complete" : "Pending"} icon={task.status === "Completed" ? "✅" : "⏳"} />
+                                            <Badge status={task.status === "Completed" ? "completed" : "pending"} label={task.status === "Completed" ? "Complete" : "Pending"} />
                                         </div>
                                         
                                         {task.status !== "Completed" && (

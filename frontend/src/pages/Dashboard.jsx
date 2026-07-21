@@ -46,7 +46,7 @@ function Dashboard(){
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-12">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Hey <span className="text-gradient">{userName || "Founder"}</span>! 👋
+                        Hey <span className="text-gradient">{userName || "Founder"}</span>
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Here's your venture command center. Track progress, manage goals, and execute milestones.
@@ -56,10 +56,10 @@ function Dashboard(){
                 {data && (
                     <>
                         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
-                            <Card title="Total Startups" value={data.total_startups} icon="🚀" description="Active companies" />
-                            <Card title="Goals Completed" value={`${data.completed_goals}/${data.total_goals}`} icon="🎯" description="Strategic milestones" />
-                            <Card title="Tasks Completed" value={`${data.completed_tasks}/${data.total_tasks}`} icon="📋" description="Actionable tasks" />
-                            <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} icon="📈" description="Venture velocity" />
+                            <Card title="Total Startups" value={data.total_startups} description="Active companies" />
+                            <Card title="Goals Completed" value={`${data.completed_goals}/${data.total_goals}`} description="Strategic milestones" />
+                            <Card title="Tasks Completed" value={`${data.completed_tasks}/${data.total_tasks}`} description="Actionable tasks" />
+                            <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} description="Venture velocity" />
                         </section>
 
                         <section className="minimal-card p-6 md:p-8 mb-10">
@@ -79,14 +79,13 @@ function Dashboard(){
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                             <section className="minimal-card p-6 md:p-8">
                                 <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
-                                    📋 Recent Activity
+                                    Recent Activity
                                 </h2>
                                 <div className="flex flex-col gap-3">
                                     {data.recent_stuff && data.recent_stuff.length > 0 ? (
                                         data.recent_stuff.slice(0, 5).map((activity) => (
                                             <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <span className="text-lg">{activity.type === "goal" ? "🎯" : "📋"}</span>
                                                     <div className="flex flex-col min-w-0">
                                                         <span className="text-sm font-semibold text-zinc-200 truncate">{activity.title}</span>
                                                         <span className="text-xs text-zinc-500">
@@ -105,7 +104,7 @@ function Dashboard(){
                                         ))
                                     ) : (
                                         <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
-                                            No recent activity. Start creating goals! 🚀
+                                            No recent activity. Start creating goals!
                                         </div>
                                     )}
                                 </div>
@@ -113,14 +112,13 @@ function Dashboard(){
 
                             <section className="minimal-card p-6 md:p-8">
                                 <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
-                                    ✅ Pending Tasks
+                                    Pending Tasks
                                 </h2>
                                 <div className="flex flex-col gap-3">
                                     {data.todos && data.todos.length > 0 ? (
                                         data.todos.slice(0, 5).map((task) => (
                                             <div key={task.id} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <span className="text-lg">📌</span>
                                                     <div className="flex flex-col min-w-0">
                                                         <span className="text-sm font-semibold text-zinc-200 truncate">{task.title}</span>
                                                         <span className="text-xs text-zinc-500">Milestone pending</span>
@@ -136,7 +134,7 @@ function Dashboard(){
                                         ))
                                     ) : (
                                         <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
-                                            All tasks done! Great job! 🎉
+                                            All tasks completed.
                                         </div>
                                     )}
                                 </div>

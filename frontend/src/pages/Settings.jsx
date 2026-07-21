@@ -43,7 +43,7 @@ function Settings(){
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Settings ⚙️
+                        Settings
                     </h1>
                     <p className="text-zinc-400 text-sm md:text-base font-medium">
                         Manage your account and workspace preferences.
@@ -90,7 +90,7 @@ function Settings(){
                                         }`}
                                         onClick={() => changeTheme("dark")}
                                     >
-                                        🌙 Dark Mode
+                                        Dark Mode
                                     </button>
                                     <button 
                                         className={`py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -100,7 +100,7 @@ function Settings(){
                                         }`}
                                         onClick={() => changeTheme("light")}
                                     >
-                                        ☀️ Light Mode
+                                        Light Mode
                                     </button>
                                 </div>
                             </div>
