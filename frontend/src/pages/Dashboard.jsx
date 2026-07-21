@@ -41,15 +41,15 @@ function Dashboard(){
     const taskProgress = data ? (data.total_tasks > 0 ? Math.round((data.completed_tasks / data.total_tasks) * 100) : 0) : 0;
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
+        <div className="min-h-screen bg-black text-zinc-100 flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-12">
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">
-                        Hey {userName || "Founder"}! 👋
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
+                        Hey <span className="text-gradient">{userName || "Founder"}</span>! 👋
                     </h1>
-                    <p className="text-zinc-400 text-sm md:text-base">
-                        Here's your venture dashboard. Track progress, manage goals, and execute milestones.
+                    <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        Here's your venture command center. Track progress, manage goals, and execute milestones.
                     </p>
                 </header>
 
@@ -62,8 +62,8 @@ function Dashboard(){
                             <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} icon="📈" description="Venture velocity" />
                         </section>
 
-                        <section className="glass-card p-6 md:p-8 mb-10">
-                            <h2 className="text-lg md:text-xl font-bold text-zinc-100 mb-8">Completion Status</h2>
+                        <section className="minimal-card p-6 md:p-8 mb-10">
+                            <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-8">Completion Status</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
                                     <p className="text-sm font-semibold text-zinc-300 mb-2">Goals Progress</p>
@@ -77,14 +77,14 @@ function Dashboard(){
                         </section>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                            <section className="glass-card p-6 md:p-8">
-                                <h2 className="text-lg md:text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
+                            <section className="minimal-card p-6 md:p-8">
+                                <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
                                     📋 Recent Activity
                                 </h2>
                                 <div className="flex flex-col gap-3">
                                     {data.recent_stuff && data.recent_stuff.length > 0 ? (
                                         data.recent_stuff.slice(0, 5).map((activity) => (
-                                            <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3.5 bg-zinc-800/20 hover:bg-zinc-800/40 rounded-xl border border-zinc-800/60 hover:border-zinc-700/80 transition-all duration-200">
+                                            <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <span className="text-lg">{activity.type === "goal" ? "🎯" : "📋"}</span>
                                                     <div className="flex flex-col min-w-0">
@@ -94,31 +94,31 @@ function Dashboard(){
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg whitespace-nowrap ml-2 ${
+                                                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border whitespace-nowrap ml-2 ${
                                                     activity.status === "Completed" 
-                                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                                                        : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                                        ? "bg-white text-zinc-950 font-bold border-white" 
+                                                        : "bg-zinc-900 text-zinc-400 border-zinc-800"
                                                 }`}>
                                                     {activity.status === "Completed" ? "Done" : "Pending"}
                                                 </span>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/20 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                                        <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
                                             No recent activity. Start creating goals! 🚀
                                         </div>
                                     )}
                                 </div>
                             </section>
 
-                            <section className="glass-card p-6 md:p-8">
-                                <h2 className="text-lg md:text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
+                            <section className="minimal-card p-6 md:p-8">
+                                <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
                                     ✅ Pending Tasks
                                 </h2>
                                 <div className="flex flex-col gap-3">
                                     {data.todos && data.todos.length > 0 ? (
                                         data.todos.slice(0, 5).map((task) => (
-                                            <div key={task.id} className="flex items-center justify-between p-3.5 bg-zinc-800/20 hover:bg-zinc-800/40 rounded-xl border border-zinc-800/60 hover:border-zinc-700/80 transition-all duration-200">
+                                            <div key={task.id} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <span className="text-lg">📌</span>
                                                     <div className="flex flex-col min-w-0">
@@ -127,7 +127,7 @@ function Dashboard(){
                                                     </div>
                                                 </div>
                                                 <button 
-                                                    className="px-3.5 py-1.5 text-xs font-semibold text-zinc-950 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 rounded-lg transition-all duration-200 whitespace-nowrap ml-2"
+                                                    className="px-3.5 py-1.5 text-xs font-bold text-zinc-950 bg-white hover:bg-zinc-200 rounded-lg transition-all duration-200 whitespace-nowrap ml-2 cursor-pointer"
                                                     onClick={() => finishTask(task.id)}
                                                 >
                                                     Complete
@@ -135,7 +135,7 @@ function Dashboard(){
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/20 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                                        <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
                                             All tasks done! Great job! 🎉
                                         </div>
                                     )}

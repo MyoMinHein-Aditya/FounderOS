@@ -2,13 +2,13 @@
 
 function StatCard({ title, value, icon, description, trend, trendIcon }) {
     return (
-        <div className="glass-card p-6 hover:-translate-y-1">
+        <div className="minimal-card p-6 hover:-translate-y-0.5">
             <div className="flex items-start justify-between mb-4">
                 <div>
-                    <p className="text-xs font-bold tracking-wider text-zinc-500 uppercase mb-1">
+                    <p className="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-1">
                         {title}
                     </p>
-                    <p className="text-3xl font-extrabold text-zinc-100">
+                    <p className="text-3xl font-extrabold text-white font-heading">
                         {value}
                     </p>
                 </div>
@@ -20,7 +20,7 @@ function StatCard({ title, value, icon, description, trend, trendIcon }) {
             )}
             
             {trend && (
-                <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                <p className="text-xs font-semibold text-zinc-300 flex items-center gap-1">
                     {trendIcon && <span>{trendIcon}</span>}
                     {trend}
                 </p>
