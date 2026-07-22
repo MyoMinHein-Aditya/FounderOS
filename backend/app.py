@@ -20,9 +20,7 @@ Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def home():
-    return {
-        "message":"FounderOs backend running"
-    }
+    return {"message": "FounderOs backend running"}
 
 @app.get("/db-test")
 def db_test():
@@ -51,46 +49,11 @@ def db_test():
     finally:
         db.close()
 
-app.include_router(
-    auth_router,
-    prefix="/auth",
-    tags=["Authentication"]
-)
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(startup_router, prefix="/startup", tags=["Startup"])
+app.include_router(goal_router, prefix="/goal", tags=["Goals"])
+app.include_router(task_router, prefix="/task", tags=["Tasks"])
+app.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
+app.include_router(agent_router, prefix="/chat", tags=["AI"])
 
-app.include_router(
-    startup_router,
-    prefix="/startup",
-    tags=["Startup"]
-)
-
-app.include_router(
-    goal_router,
-    prefix="/goal",
-    tags=["Goals"]
-)
-
-app.include_router(
-    task_router,
-    prefix="/task",
-    tags=["Tasks"]
-)
-
-app.include_router(
-    dashboard_router,
-    prefix="/dashboard",
-    tags=["Dashboard"]
-)
-
-app.include_router(
-    agent_router,
-    prefix="/chat",
-    tags=["AI"]
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
