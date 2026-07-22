@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from database.db import engine
 from database.base import Base
 import models.users
@@ -32,20 +31,10 @@ def db_test():
         dialect = db.bind.dialect.name
         host = db.bind.url.host or "Local In-Memory"
         database = db.bind.url.database
-        return {
-            "status": "success",
-            "message": "Database connection successful!",
-            "dialect": dialect,
-            "host": host,
-            "database": database
-        }
+        return {"status": "success", "message": "Database connection successful!", "dialect": dialect, "host": host, "database": database}
     except Exception as e:
         import traceback
-        return {
-            "status": "error",
-            "message": str(e),
-            "traceback": traceback.format_exc()
-        }
+        return {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
     finally:
         db.close()
 
