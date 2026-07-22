@@ -16,7 +16,6 @@ import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
 import AI from "./pages/AI";
 
-// Protecting routes with authentication check
 
 function AuthCheck({ children }) {
   const [authorized, setAuthorized] = useState(null);

@@ -2,7 +2,6 @@ import {useState} from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 
-// Authenticating user with email and password
 
 function Login(){
     const [email,setEmail] = useState("");

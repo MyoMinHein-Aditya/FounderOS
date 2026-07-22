@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 
-// Customizing workspace preferences and account
-
 function Settings(){
     const [user, setUser] = useState(null);
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");

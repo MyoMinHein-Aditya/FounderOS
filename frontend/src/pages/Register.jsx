@@ -2,7 +2,6 @@ import {useState} from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 
-// Creating new user account and workspace
 
 function Register(){
     const[name,setName] = useState("");

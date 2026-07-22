@@ -1,5 +1,3 @@
-// Display stat cards with icons and trends
-
 function Card({ title, value, icon, trend, subtext }) {
     return (
         <div className="minimal-card p-6 hover:-translate-y-0.5">

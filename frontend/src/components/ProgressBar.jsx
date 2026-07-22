@@ -1,5 +1,3 @@
-// Display completion percentage visually
-
 function ProgressBar({ percentage, label, showPercent }) {
     return (
         <div className="flex flex-col gap-2">

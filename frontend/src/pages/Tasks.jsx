@@ -3,7 +3,6 @@ import api from "../api/axios"
 import Badge from "../components/Badge"
 import Navbar from "../components/Navbar"
 
-// Creating and managing startup milestone tasks
 
 function Tasks(){
     const [tasks,setTasks] = useState([]);
