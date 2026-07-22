@@ -1,135 +1,172 @@
 @import "tailwindcss";
 
+:root {
+  --bg-canvas: #090d16;
+  --surface: #0f1523;
+  --surface-strong: #0b0f1a;
+  --border: #1c263c;
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #64748b;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+}
+
+html.light {
+  --bg-canvas: whitesmoke;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --border: #e4e4e7;
+  --text-primary: #09090b;
+  --text-secondary: #18181b;
+  --text-muted: #71717a;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
 @layer base {
   body {
-    background-color: #090d16;
-    color: #f8fafc;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  
+
   h1, h2, h3, h4, h5, h6, .font-heading {
     font-family: 'Outfit', sans-serif;
   }
-  
+
   ::selection {
     background-color: #ffffff;
     color: #000000;
   }
-  
+
   * {
-    @apply transition-all duration-200;
+    transition: all 0.2s ease;
   }
-  
+
   button {
-    @apply cursor-pointer;
+    cursor: pointer;
   }
-  
+
   input, select, textarea {
-    @apply cursor-text;
+    cursor: text;
   }
 
   .bg-black, .bg-zinc-950 {
-    background-color: #090d16;
+    background-color: var(--bg-canvas);
   }
 
   aside {
-    background-color: #090d16 !important;
-    border-color: #1c263c !important;
+    background-color: var(--bg-canvas) !important;
+    border-color: var(--border) !important;
   }
 }
 
 @layer components {
   .minimal-card, .glass-card {
-    background-color: #0f1523;
-    border: 1px solid #1c263c;
-    @apply rounded-2xl transition-all duration-200;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
   }
 
   .minimal-card:hover, .glass-card:hover {
     border-color: #2c3a59;
   }
-  
+
   .minimal-input, .glass-input {
-    background-color: #0b0f1a;
-    border: 1px solid #1c263c;
-    color: #f8fafc;
-    @apply rounded-xl px-4 py-3 text-sm focus:outline-none transition-all duration-200;
+    background-color: var(--surface-strong);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s ease;
   }
 
   .minimal-input::placeholder, .glass-input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
   }
 
   .minimal-input:focus, .glass-input:focus {
     border-color: #475569;
   }
-  
+
   .btn-primary {
-    @apply bg-gradient-to-r from-white via-slate-100 to-slate-300 hover:from-slate-200 hover:to-slate-400 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.98];
+    background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 50%, #cbd5e1 100%);
+    color: #0f172a;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
   }
-  
+
+  .btn-primary:hover {
+    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
   .btn-secondary {
-    background-color: #0f1523;
-    border: 1px solid #1c263c;
-    color: #f8fafc;
-    @apply font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98];
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
 
   .btn-secondary:hover {
     background-color: #141c2e;
     border-color: #2c3a59;
   }
-  
+
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
   .badge {
-    background-color: #0f1523;
-    border: 1px solid #1c263c;
-    color: #e2e8f0;
-    @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
   }
-  
+
   .progress-bar {
-    background-color: #0b0f1a;
-    border: 1px solid #1c263c;
-    @apply w-full rounded-full h-2 overflow-hidden;
+    background-color: var(--surface-strong);
+    border: 1px solid var(--border);
+    width: 100%;
+    border-radius: 9999px;
+    height: 0.5rem;
+    overflow: hidden;
   }
-  
+
   .progress-fill {
-    @apply h-full rounded-full bg-gradient-to-r from-slate-400 via-slate-200 to-white;
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #94a3b8 0%, #e2e8f0 50%, #ffffff 100%);
   }
-  
+
   .text-gradient {
-    @apply bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, #ffffff 0%, #e2e8f0 50%, #cbd5e1 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
-}
-html.light body {
-  background-color: whitesmoke !important;
-  color: #09090b !important;
-}
-
-html.light .minimal-card,
-html.light .glass-card {
-  background-color: #ffffff !important;
-  border-color: #e4e4e7 !important;
-  color: #09090b !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-}
-
-html.light .minimal-input,
-html.light .glass-input {
-  background-color: #ffffff !important;
-  border-color: #d4d4d8 !important;
-  color: #09090b !important;
-}
-
-html.light .minimal-input::placeholder,
-html.light .glass-input::placeholder {
-  color: #71717a !important;
-}
-
-html.light .minimal-input:focus,
-html.light .glass-input:focus {
-  border-color: #18181b !important;
 }
 
 html.light .btn-primary {
@@ -141,19 +178,8 @@ html.light .btn-primary:hover {
   background: #27272a !important;
 }
 
-html.light .btn-secondary {
-  background-color: #ffffff !important;
-  border-color: #e4e4e7 !important;
-  color: #09090b !important;
-}
-
 html.light .btn-secondary:hover {
   background-color: #f4f4f5 !important;
-}
-
-html.light aside {
-  background-color: #ffffff !important;
-  border-color: #e4e4e7 !important;
 }
 
 html.light nav a {
@@ -172,7 +198,8 @@ html.light nav a.bg-white {
 }
 
 html.light .text-gradient {
-  background: linear-gradient(to right, #09090b, #3f3f46) !important;
+  background-image: linear-gradient(90deg, #09090b 0%, #3f3f46 100%) !important;
+  background-clip: text !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
@@ -189,39 +216,47 @@ html.light .progress-bar {
 }
 
 html.light .progress-fill {
-  background: linear-gradient(to right, #3f3f46, #09090b) !important;
+  background: linear-gradient(90deg, #3f3f46 0%, #09090b 100%) !important;
 }
 
 html.light .text-white,
 html.light .text-zinc-100 {
-  color: #09090b !important;
+  color: var(--text-primary) !important;
 }
 
-html.light .text-zinc-200 {
-  color: #18181b !important;
-}
-
+html.light .text-zinc-200,
 html.light .text-zinc-300 {
-  color: #27272a !important;
+  color: var(--text-secondary) !important;
 }
 
-html.light .text-zinc-400 {
-  color: #52525b !important;
+html.light .text-zinc-400,
+html.light .text-zinc-500,
+html.light .text-zinc-600 {
+  color: var(--text-muted) !important;
+}
+
+html.light .placeholder-zinc-400,
+html.light .placeholder-zinc-500 {
+  color: var(--text-muted) !important;
 }
 
 html.light .bg-zinc-950,
-html.light .bg-black {
-  background-color: whitesmoke !important;
-}
-
+html.light .bg-zinc-900,
 html.light .bg-zinc-900\/60,
 html.light .bg-zinc-900\/40,
-html.light .bg-zinc-900 {
-  background-color: #ffffff !important;
-  border-color: #e4e4e7 !important;
+html.light .bg-zinc-800,
+html.light .bg-black {
+  background-color: var(--surface) !important;
+}
+
+html.light .border-zinc-700,
+html.light .border-zinc-800,
+html.light .border-zinc-900,
+html.light .border-zinc-950 {
+  border-color: var(--border) !important;
 }
 
 html.light select option {
-  background-color: #ffffff !important;
-  color: #09090b !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
 }
