@@ -40,7 +40,6 @@
 }
 
 @layer components {
-  /* Minimal Solid Card (Near-Black Midnight Blue) */
   .minimal-card, .glass-card {
     background-color: #0f1523;
     border: 1px solid #1c263c;
@@ -51,7 +50,6 @@
     border-color: #2c3a59;
   }
   
-  /* Minimal Input Field */
   .minimal-input, .glass-input {
     background-color: #0b0f1a;
     border: 1px solid #1c263c;
@@ -67,12 +65,10 @@
     border-color: #475569;
   }
   
-  /* High-Contrast White Gradient Primary Button */
   .btn-primary {
     @apply bg-gradient-to-r from-white via-slate-100 to-slate-300 hover:from-slate-200 hover:to-slate-400 text-slate-950 font-bold py-3 px-6 rounded-xl transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.98];
   }
   
-  /* Solid Minimal Dark Secondary Button */
   .btn-secondary {
     background-color: #0f1523;
     border: 1px solid #1c263c;
@@ -85,7 +81,6 @@
     border-color: #2c3a59;
   }
   
-  /* Minimal Badge */
   .badge {
     background-color: #0f1523;
     border: 1px solid #1c263c;
@@ -93,27 +88,20 @@
     @apply px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
   
-  /* Minimal Progress Bar */
   .progress-bar {
     background-color: #0b0f1a;
     border: 1px solid #1c263c;
     @apply w-full rounded-full h-2 overflow-hidden;
   }
   
-  /* Monochrome Silver Gradient Progress Fill */
   .progress-fill {
     @apply h-full rounded-full bg-gradient-to-r from-slate-400 via-slate-200 to-white;
   }
   
-  /* Monochrome Gradient Heading */
   .text-gradient {
     @apply bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent;
   }
 }
-
-/* ==========================================================================
-   Light Mode Theme Overrides (Whitesmoke background, black text)
-   ========================================================================== */
 html.light body {
   background-color: whitesmoke !important;
   color: #09090b !important;

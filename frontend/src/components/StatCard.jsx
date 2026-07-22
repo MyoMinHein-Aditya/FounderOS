@@ -1,5 +1,3 @@
-// Display analytics data with icon and description
-
 function StatCard({ title, value, icon, description, trend, trendIcon }) {
     return (
         <div className="minimal-card p-6 hover:-translate-y-0.5">

@@ -4,7 +4,6 @@ import Card from "../components/Card";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
-// Loading dashboard stats and managing data
 
 function Dashboard(){
     const [data, setData] = useState(null);

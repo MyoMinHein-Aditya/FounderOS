@@ -4,7 +4,6 @@ import Badge from "../components/Badge";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
-// Managing startup portfolio with creation and tracking
 
 function Startup(){
     const [startups, setStartups] = useState([]);

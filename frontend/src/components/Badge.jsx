@@ -1,5 +1,3 @@
-// Styling status indicators with minimal monochrome contrast
-
 function Badge({ status, label, icon }) {
     const badgeStyles = {
         completed: "bg-zinc-900 text-zinc-200 border-zinc-700",
