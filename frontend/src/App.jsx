@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate
 } from "react-router-dom";
+import api from "./api/axios";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,10 +19,36 @@ import AI from "./pages/AI";
 // Protecting routes with authentication check
 
 function AuthCheck({ children }) {
-  const token = localStorage.getItem("token");
-  if (!token) {
+  const [authorized, setAuthorized] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthorized(false);
+      return;
+    }
+    
+    api.get("/auth/me")
+      .then(() => setAuthorized(true))
+      .catch(() => {
+        localStorage.removeItem("token");
+        setAuthorized(false);
+      });
+  }, []);
+
+  if (authorized === null) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center text-zinc-500">
+        <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-4"></div>
+        <p className="animate-pulse text-sm font-medium">Verifying access credentials...</p>
+      </div>
+    );
+  }
+
+  if (authorized === false) {
     return <Navigate to="/" replace />;
   }
+
   return children;
 }
 
