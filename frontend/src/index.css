@@ -94,18 +94,19 @@ html.light {
   }
 
   .btn-primary {
-    background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 50%, #cbd5e1 100%);
-    color: #0f172a;
+    background-color: var(--text-primary);
+    color: var(--bg-canvas);
     font-weight: 700;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     transition: all 0.2s ease;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    border: 1px solid transparent;
   }
 
   .btn-primary:hover {
-    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+    background-color: var(--text-secondary);
   }
 
   .btn-primary:active {
@@ -124,8 +125,8 @@ html.light {
   }
 
   .btn-secondary:hover {
-    background-color: #141c2e;
-    border-color: #2c3a59;
+    background-color: var(--surface-strong);
+    border-color: var(--border);
   }
 
   .btn-secondary:active {
@@ -168,20 +169,6 @@ html.light {
     -webkit-text-fill-color: transparent;
   }
 }
-
-html.light .btn-primary {
-  background: #09090b !important;
-  color: #ffffff !important;
-}
-
-html.light .btn-primary:hover {
-  background: #27272a !important;
-}
-
-html.light .btn-secondary:hover {
-  background-color: #f4f4f5 !important;
-}
-
 html.light nav a {
   color: #52525b !important;
 }

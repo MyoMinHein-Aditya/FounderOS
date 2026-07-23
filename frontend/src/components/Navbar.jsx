@@ -83,7 +83,9 @@ function Navbar(){
             <button 
                 id="sidebar-trigger"
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-200 hover:text-white hover:bg-zinc-900 transition-all cursor-pointer flex items-center justify-center"
+                className={`fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-200 hover:text-white hover:bg-zinc-900 transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                    isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                }`}
                 aria-label="Toggle Sidebar"
             >
                 <span className="text-xl">☰</span>
@@ -102,8 +104,8 @@ function Navbar(){
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                <div>
-                    <div className="flex items-center justify-between pb-6 border-b border-zinc-900 mb-6">
+                <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
+                    <div className="flex items-center justify-between pb-6 border-b border-zinc-900 mb-6 mt-1 flex-shrink-0">
                         <span className="text-2xl font-extrabold text-gradient font-heading tracking-tight">
                             FounderOS
                         </span>
@@ -137,7 +139,7 @@ function Navbar(){
                     </div>
 
                     {showNotifications && (
-                        <div className="mb-6 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-xs flex flex-col gap-2">
+                        <div className="mb-6 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-xs flex flex-col gap-2 flex-shrink-0">
                             <div className="flex justify-between items-center pb-2 border-b border-zinc-800/60">
                                 <span className="font-bold text-zinc-200">Alerts</span>
                                 {notifications.length > 0 && (
@@ -163,7 +165,7 @@ function Navbar(){
                         </div>
                     )}
                     
-                    <nav className="flex flex-col gap-1.5">
+                    <nav className="flex flex-col gap-1.5 mb-6">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.path;
                             return (
@@ -184,7 +186,7 @@ function Navbar(){
                     </nav>
                 </div>
 
-                <div className="mt-auto pt-6 border-t border-zinc-900 flex flex-col gap-4">
+                <div className="pt-6 border-t border-zinc-900 flex flex-col gap-4 flex-shrink-0 bg-zinc-950">
                     {user && (
                         <div className="flex items-center gap-3 px-2">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white via-zinc-200 to-zinc-400 flex items-center justify-center text-zinc-950 font-bold text-sm">
