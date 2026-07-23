@@ -67,6 +67,7 @@ function Navbar(){
         { path: "/notes", label: "Notes" },
         { path: "/documents", label: "Documents" },
         { path: "/calendar", label: "Calendar" },
+        { path: "/team", label: "Team" },
         { path: "/ai", label: "AI Assistant" },
         { path: "/settings", label: "Settings" }
     ];

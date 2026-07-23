@@ -20,6 +20,7 @@ import AI from "./pages/AI";
 import Notes from "./pages/Notes";
 import Documents from "./pages/Documents";
 import CalendarView from "./pages/CalendarView";
+import Team from "./pages/Team";
 
 // Protecting routes with authentication check
 
@@ -74,6 +75,7 @@ function App(){
             <Route path="/notes" element={<AuthCheck><Notes/></AuthCheck>}/>
             <Route path="/documents" element={<AuthCheck><Documents/></AuthCheck>}/>
             <Route path="/calendar" element={<AuthCheck><CalendarView/></AuthCheck>}/>
+            <Route path="/team" element={<AuthCheck><Team/></AuthCheck>}/>
           </Routes>
         </BrowserRouter>
       </ToastProvider>

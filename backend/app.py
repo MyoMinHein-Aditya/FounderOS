@@ -10,6 +10,9 @@ import models.note
 import models.document
 import models.notification
 import models.calendar_event
+import models.team
+import models.team_member
+import models.comment
 from routes.auth import router as auth_router
 from routes.startup import router as startup_router
 from routes.goal import router as goal_router
@@ -20,6 +23,9 @@ from routes.notes import router as notes_router
 from routes.documents import router as documents_router
 from routes.notifications import router as notifications_router
 from routes.calendar import router as calendar_router
+from routes.ws import router as ws_router
+from routes.collaboration import router as collaboration_router
+from routes.ai_features import router as ai_features_router
 
 app = FastAPI()
 
@@ -56,5 +62,8 @@ app.include_router(notes_router, prefix="/notes", tags=["Notes"])
 app.include_router(documents_router, prefix="/documents", tags=["Documents"])
 app.include_router(notifications_router, prefix="/notifications", tags=["Notifications"])
 app.include_router(calendar_router, prefix="/calendar", tags=["Calendar"])
+app.include_router(ws_router, tags=["WebSockets"])
+app.include_router(collaboration_router, prefix="/collaboration", tags=["Collaboration"])
+app.include_router(ai_features_router, prefix="/ai-features", tags=["AI Workspace"])
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
