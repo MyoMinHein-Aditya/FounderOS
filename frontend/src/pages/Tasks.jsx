@@ -56,7 +56,10 @@ function Tasks() {
 
         // Setup real-time WebSocket connection for activity ticker
         const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsHost = window.location.hostname === "localhost" ? "localhost:8000" : window.location.host;
+        const envUrl = import.meta.env.VITE_API_URL;
+        const wsHost = envUrl 
+            ? envUrl.replace("http://", "").replace("https://", "")
+            : (window.location.hostname === "localhost" ? "localhost:8000" : window.location.host);
         const socket = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
         
         socket.onmessage = (event) => {
