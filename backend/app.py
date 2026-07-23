@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database.db import engine
 from database.base import Base
@@ -13,6 +13,7 @@ import models.calendar_event
 import models.team
 import models.team_member
 import models.comment
+import models.crm
 from routes.auth import router as auth_router
 from routes.startup import router as startup_router
 from routes.goal import router as goal_router
@@ -26,8 +27,10 @@ from routes.calendar import router as calendar_router
 from routes.ws import router as ws_router
 from routes.collaboration import router as collaboration_router
 from routes.ai_features import router as ai_features_router
+from routes.crm import router as crm_router
+from middleware.rate_limit import rate_limit_middleware
 
-app = FastAPI()
+app = FastAPI(dependencies=[Depends(rate_limit_middleware)])
 
 Base.metadata.create_all(bind=engine)
 
@@ -65,5 +68,6 @@ app.include_router(calendar_router, prefix="/calendar", tags=["Calendar"])
 app.include_router(ws_router, tags=["WebSockets"])
 app.include_router(collaboration_router, prefix="/collaboration", tags=["Collaboration"])
 app.include_router(ai_features_router, prefix="/ai-features", tags=["AI Workspace"])
+app.include_router(crm_router, prefix="/crm", tags=["CRM"])
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])

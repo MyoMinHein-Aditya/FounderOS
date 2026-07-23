@@ -1,0 +1,23 @@
+{
+  "build": {
+    "distDir": "../dist",
+    "devPath": "http://localhost:5173"
+  },
+  "package": {
+    "productName": "FounderOS",
+    "version": "1.0.0"
+  },
+  "tauri": {
+    "bundle": {
+      "identifier": "com.founderos.app"
+    },
+    "window": [
+      {
+        "title": "FounderOS",
+        "width": 1280,
+        "height": 720,
+        "resizable": true
+      }
+    ]
+  }
+}
