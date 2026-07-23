@@ -44,7 +44,6 @@ class DashboardService:
         } for t in upcoming_tasks]
 
         from models.calendar_event import CalendarEvent
-        from models.goal import Goal
         
         # Directly filter calendar events by user_id (no join needed, avoiding mapping crashes)
         upcoming_events = self.db.query(CalendarEvent).filter(CalendarEvent.user_id == user_id).order_by(CalendarEvent.date.asc()).limit(3).all()
