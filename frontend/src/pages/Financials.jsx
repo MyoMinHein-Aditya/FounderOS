@@ -17,10 +17,46 @@ function Financials() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [aiFeedback, setAiFeedback] = useState("");
 
-    // Helper to format raw **text** into bold tags
-    function formatMessageContent(content) {
-        if (!content) return "";
-        const parts = content.split(/\*\*([^*]+)\*\*/g);
+    // Helper to format raw markdown into beautiful React elements
+    function renderMarkdown(text) {
+        if (!text) return null;
+        const lines = text.split("\n");
+        return lines.map((line, lineIndex) => {
+            const trimmed = line.trim();
+            if (trimmed.startsWith("### ")) {
+                return <h3 key={lineIndex} className="text-sm font-bold text-white mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
+            }
+            if (trimmed.startsWith("## ")) {
+                return <h2 key={lineIndex} className="text-base font-bold text-white mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
+            }
+            if (trimmed.startsWith("# ")) {
+                return <h1 key={lineIndex} className="text-lg font-extrabold text-white mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
+            }
+            if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                return (
+                    <ul key={lineIndex} className="list-disc pl-5 mb-1.5 space-y-1">
+                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(trimmed.substring(2))}</li>
+                    </ul>
+                );
+            }
+            const matchNum = trimmed.match(/^(\d+)\.\s(.*)/);
+            if (matchNum) {
+                return (
+                    <ol key={lineIndex} className="list-decimal pl-5 mb-1.5 space-y-1">
+                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(matchNum[2])}</li>
+                    </ol>
+                );
+            }
+            if (trimmed === "") {
+                return <div key={lineIndex} className="h-2"></div>;
+            }
+            return <p key={lineIndex} className="text-xs md:text-sm text-zinc-300 leading-relaxed mb-2">{parseInline(line)}</p>;
+        });
+    }
+
+    function parseInline(text) {
+        if (!text) return "";
+        const parts = text.split(/\*\*([^*]+)\*\*/g);
         return parts.map((part, index) => {
             if (index % 2 === 1) {
                 return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
@@ -183,7 +219,7 @@ function Financials() {
                                 <p className="animate-pulse text-xs">Computing MRR & cash projections...</p>
                             </div>
                         ) : aiFeedback ? (
-                            <p className="whitespace-pre-wrap">{formatMessageContent(aiFeedback)}</p>
+                            <div className="leading-relaxed">{renderMarkdown(aiFeedback)}</div>
                         ) : (
                             <p className="text-zinc-500 text-xs text-center py-6">Request a dynamic AI Runway and CAC audit report.</p>
                         )}

@@ -32,10 +32,46 @@ function AI() {
     const [loadingWriter, setLoadingWriter] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
-    // Helper to format raw **text** into bold tags
-    function formatMessageContent(content) {
-        if (!content) return "";
-        const parts = content.split(/\*\*([^*]+)\*\*/g);
+    // Helper to format raw markdown into beautiful React elements
+    function renderMarkdown(text) {
+        if (!text) return null;
+        const lines = text.split("\n");
+        return lines.map((line, lineIndex) => {
+            const trimmed = line.trim();
+            if (trimmed.startsWith("### ")) {
+                return <h3 key={lineIndex} className="text-sm font-bold text-white mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
+            }
+            if (trimmed.startsWith("## ")) {
+                return <h2 key={lineIndex} className="text-base font-bold text-white mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
+            }
+            if (trimmed.startsWith("# ")) {
+                return <h1 key={lineIndex} className="text-lg font-extrabold text-white mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
+            }
+            if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                return (
+                    <ul key={lineIndex} className="list-disc pl-5 mb-1.5 space-y-1">
+                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(trimmed.substring(2))}</li>
+                    </ul>
+                );
+            }
+            const matchNum = trimmed.match(/^(\d+)\.\s(.*)/);
+            if (matchNum) {
+                return (
+                    <ol key={lineIndex} className="list-decimal pl-5 mb-1.5 space-y-1">
+                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(matchNum[2])}</li>
+                    </ol>
+                );
+            }
+            if (trimmed === "") {
+                return <div key={lineIndex} className="h-2"></div>;
+            }
+            return <p key={lineIndex} className="text-xs md:text-sm text-zinc-300 leading-relaxed mb-2">{parseInline(line)}</p>;
+        });
+    }
+
+    function parseInline(text) {
+        if (!text) return "";
+        const parts = text.split(/\*\*([^*]+)\*\*/g);
         return parts.map((part, index) => {
             if (index % 2 === 1) {
                 return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
@@ -218,13 +254,13 @@ function AI() {
                                             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                                         >
                                             <div
-                                                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm md:text-base transition-all duration-200 ${
+                                                className={`max-w-[80%] rounded-2xl px-4 py-3 transition-all duration-200 ${
                                                     msg.role === "user"
                                                         ? "bg-white text-zinc-950 font-medium rounded-br-none"
                                                         : "bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-bl-none"
                                                 }`}
                                             >
-                                                <p className="whitespace-pre-wrap leading-relaxed">{formatMessageContent(msg.content)}</p>
+                                                <div className="leading-relaxed">{renderMarkdown(msg.content)}</div>
                                             </div>
                                         </div>
                                     ))
@@ -281,7 +317,7 @@ function AI() {
                                         <p className="animate-pulse text-xs">Assembling SWOT matrices...</p>
                                     </div>
                                 ) : swotReport ? (
-                                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(swotReport)}</p>
+                                    <div className="leading-relaxed">{renderMarkdown(swotReport)}</div>
                                 ) : (
                                     <p className="text-zinc-500 text-xs text-center py-12">Click Generate SWOT to compile strategic venture analysis.</p>
                                 )}
@@ -317,7 +353,7 @@ function AI() {
                                             <p className="animate-pulse text-xs">Parsing transcripts...</p>
                                         </div>
                                     ) : meetingReport ? (
-                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(meetingReport)}</p>
+                                        <div className="leading-relaxed">{renderMarkdown(meetingReport)}</div>
                                     ) : (
                                         <p className="text-zinc-500 text-xs text-center py-12">Action items, decisions, and deadlines will render here.</p>
                                     )}
@@ -367,7 +403,7 @@ function AI() {
                                             <p className="animate-pulse text-xs">Writing document blueprint...</p>
                                         </div>
                                     ) : draftedContent ? (
-                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(draftedContent)}</p>
+                                        <div className="leading-relaxed">{renderMarkdown(draftedContent)}</div>
                                     ) : (
                                         <p className="text-zinc-500 text-xs text-center py-12">Drafted document preview will load here.</p>
                                     )}
