@@ -9,12 +9,12 @@ class DashboardService:
 
     def get_stats(self, user_id: int) -> dict:
         total_startups = self.db.query(Startup).filter(Startup.owner_id == user_id).count()
-        total_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id).count()
-        completed_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id, Goal.status == "Completed").count()
-        total_tasks = self.db.query(Task).join(Startup).filter(Startup.owner_id == user_id).count()
-        completed_tasks = self.db.query(Task).join(Startup).filter(Startup.owner_id == user_id, Task.status == "Completed").count()
+        total_goals = self.db.query(Goal).join(Startup, Goal.startup_id == Startup.id).filter(Startup.owner_id == user_id).count()
+        completed_goals = self.db.query(Goal).join(Startup, Goal.startup_id == Startup.id).filter(Startup.owner_id == user_id, Goal.status == "Completed").count()
+        total_tasks = self.db.query(Task).join(Startup, Task.startup_id == Startup.id).filter(Startup.owner_id == user_id).count()
+        completed_tasks = self.db.query(Task).join(Startup, Task.startup_id == Startup.id).filter(Startup.owner_id == user_id, Task.status == "Completed").count()
 
-        recent_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id).order_by(Goal.id.desc()).limit(5).all()
+        recent_goals = self.db.query(Goal).join(Startup, Goal.startup_id == Startup.id).filter(Startup.owner_id == user_id).order_by(Goal.id.desc()).limit(5).all()
         recent_goals_list = [{
             "id": g.id,
             "title": g.title,
@@ -22,7 +22,7 @@ class DashboardService:
             "type": "goal"
         } for g in recent_goals]
 
-        recent_tasks = self.db.query(Task).join(Startup).filter(Startup.owner_id == user_id).order_by(Task.id.desc()).limit(5).all()
+        recent_tasks = self.db.query(Task).join(Startup, Task.startup_id == Startup.id).filter(Startup.owner_id == user_id).order_by(Task.id.desc()).limit(5).all()
         recent_tasks_list = [{
             "id": t.id,
             "title": t.title,
@@ -36,7 +36,7 @@ class DashboardService:
             reverse=True
         )[:5]
 
-        upcoming_tasks = self.db.query(Task).join(Startup).filter(Startup.owner_id == user_id, Task.status == "Pending").order_by(Task.id.asc()).limit(5).all()
+        upcoming_tasks = self.db.query(Task).join(Startup, Task.startup_id == Startup.id).filter(Startup.owner_id == user_id, Task.status == "Pending").order_by(Task.id.asc()).limit(5).all()
         todos = [{
             "id": t.id,
             "title": t.title,
@@ -45,7 +45,9 @@ class DashboardService:
 
         from models.calendar_event import CalendarEvent
         from models.goal import Goal
-        upcoming_events = self.db.query(CalendarEvent).join(Startup).filter(Startup.owner_id == user_id).order_by(CalendarEvent.date.asc()).limit(3).all()
+        
+        # Directly filter calendar events by user_id (no join needed, avoiding mapping crashes)
+        upcoming_events = self.db.query(CalendarEvent).filter(CalendarEvent.user_id == user_id).order_by(CalendarEvent.date.asc()).limit(3).all()
         events_list = []
         for e in upcoming_events:
             startup = self.db.query(Startup).filter(Startup.id == e.startup_id).first()
@@ -56,7 +58,7 @@ class DashboardService:
                 "startup_name": startup.name if startup else "N/A"
             })
 
-        pending_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id, Goal.status == "Pending").order_by(Goal.id.asc()).limit(3).all()
+        pending_goals = self.db.query(Goal).join(Startup, Goal.startup_id == Startup.id).filter(Startup.owner_id == user_id, Goal.status == "Pending").order_by(Goal.id.asc()).limit(3).all()
         pending_goals_list = []
         for g in pending_goals:
             startup = self.db.query(Startup).filter(Startup.id == g.startup_id).first()
