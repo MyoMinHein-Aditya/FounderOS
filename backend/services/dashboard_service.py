@@ -46,19 +46,25 @@ class DashboardService:
         from models.calendar_event import CalendarEvent
         from models.goal import Goal
         upcoming_events = self.db.query(CalendarEvent).join(Startup).filter(Startup.owner_id == user_id).order_by(CalendarEvent.date.asc()).limit(3).all()
-        events_list = [{
-            "id": e.id,
-            "title": e.title,
-            "date": e.date,
-            "startup_name": self.db.query(Startup).filter(Startup.id == e.startup_id).first().name
-        } for e in upcoming_events]
+        events_list = []
+        for e in upcoming_events:
+            startup = self.db.query(Startup).filter(Startup.id == e.startup_id).first()
+            events_list.append({
+                "id": e.id,
+                "title": e.title,
+                "date": e.date,
+                "startup_name": startup.name if startup else "N/A"
+            })
 
         pending_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id, Goal.status == "Pending").order_by(Goal.id.asc()).limit(3).all()
-        pending_goals_list = [{
-            "id": g.id,
-            "title": g.title,
-            "startup_name": self.db.query(Startup).filter(Startup.id == g.startup_id).first().name
-        } for g in pending_goals]
+        pending_goals_list = []
+        for g in pending_goals:
+            startup = self.db.query(Startup).filter(Startup.id == g.startup_id).first()
+            pending_goals_list.append({
+                "id": g.id,
+                "title": g.title,
+                "startup_name": startup.name if startup else "N/A"
+            })
 
         return {
             "total_startups": total_startups,
