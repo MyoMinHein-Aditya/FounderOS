@@ -32,6 +32,18 @@ function AI() {
     const [loadingWriter, setLoadingWriter] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
+    // Helper to format raw **text** into bold tags
+    function formatMessageContent(content) {
+        if (!content) return "";
+        const parts = content.split(/\*\*([^*]+)\*\*/g);
+        return parts.map((part, index) => {
+            if (index % 2 === 1) {
+                return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
+            }
+            return part;
+        });
+    }
+
     async function loadStartups() {
         try {
             const res = await api.get("/startup/get_startups");
@@ -212,7 +224,7 @@ function AI() {
                                                         : "bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-bl-none"
                                                 }`}
                                             >
-                                                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                                <p className="whitespace-pre-wrap leading-relaxed">{formatMessageContent(msg.content)}</p>
                                             </div>
                                         </div>
                                     ))
@@ -269,7 +281,7 @@ function AI() {
                                         <p className="animate-pulse text-xs">Assembling SWOT matrices...</p>
                                     </div>
                                 ) : swotReport ? (
-                                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{swotReport}</p>
+                                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(swotReport)}</p>
                                 ) : (
                                     <p className="text-zinc-500 text-xs text-center py-12">Click Generate SWOT to compile strategic venture analysis.</p>
                                 )}
@@ -305,7 +317,7 @@ function AI() {
                                             <p className="animate-pulse text-xs">Parsing transcripts...</p>
                                         </div>
                                     ) : meetingReport ? (
-                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{meetingReport}</p>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(meetingReport)}</p>
                                     ) : (
                                         <p className="text-zinc-500 text-xs text-center py-12">Action items, decisions, and deadlines will render here.</p>
                                     )}
@@ -355,7 +367,7 @@ function AI() {
                                             <p className="animate-pulse text-xs">Writing document blueprint...</p>
                                         </div>
                                     ) : draftedContent ? (
-                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{draftedContent}</p>
+                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 font-mono">{formatMessageContent(draftedContent)}</p>
                                     ) : (
                                         <p className="text-zinc-500 text-xs text-center py-12">Drafted document preview will load here.</p>
                                     )}
