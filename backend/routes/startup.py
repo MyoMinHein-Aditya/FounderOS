@@ -16,9 +16,9 @@ def create_startup(startup: StartupCreate, db: Session = Depends(get_db), curren
     return {"message": "Startup Created", "startup_id": new_startup.id}
 
 @router.get("/get_startups")
-def get_startups(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def get_startups(search: str = None, page: int = 1, limit: int = 10, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     service = StartupService(db)
-    return service.get_all_by_owner(current_user["user_id"])
+    return service.get_all_by_owner(current_user["user_id"], search, page, limit)
 
 @router.get("/{startup_id}/analyze")
 def analyze_startup(startup_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):

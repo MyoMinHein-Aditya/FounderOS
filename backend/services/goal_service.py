@@ -23,8 +23,13 @@ class GoalService:
         self.db.refresh(goal)
         return goal
 
-    def get_all_by_owner(self, owner_id: int) -> list:
-        return self.db.query(Goal).join(Startup).filter(Startup.owner_id == owner_id).all()
+    def get_all_by_owner(self, owner_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10) -> list:
+        query = self.db.query(Goal).join(Startup).filter(Startup.owner_id == owner_id)
+        if search:
+            query = query.filter(Goal.title.ilike(f"%{search}%") | Goal.description.ilike(f"%{search}%"))
+        if status:
+            query = query.filter(Goal.status == status)
+        return query.offset((page - 1) * limit).limit(limit).all()
 
     def complete(self, goal_id: int, owner_id: int) -> bool:
         goal = self.db.query(Goal).join(Startup).filter(Goal.id == goal_id, Startup.owner_id == owner_id).first()
