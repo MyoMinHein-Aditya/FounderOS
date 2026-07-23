@@ -1,21 +1,30 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import api from "../api/axios";
 import Card from "../components/Card";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
-// Loading dashboard stats and managing data
-
-function Dashboard(){
+function Dashboard() {
     const [data, setData] = useState(null);
     const [userName, setUserName] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    async function loadStats(){
-        const res = await api.get("/dashboard/get_stats");
-        setData(res.data);
+    async function loadStats() {
+        try {
+            setLoading(true);
+            const res = await api.get("/dashboard/get_stats");
+            setData(res.data);
+            setError(null);
+        } catch (err) {
+            console.error("Dashboard statistics loading failed:", err);
+            setError("Unable to sync database metrics. Ensure your backend is active and database is connected.");
+        } finally {
+            setLoading(false);
+        }
     }
 
-    async function loadUser(){
+    async function loadUser() {
         try {
             const res = await api.get("/auth/me");
             setUserName(res.data.name);
@@ -30,8 +39,12 @@ function Dashboard(){
     }, []);
 
     async function finishTask(taskId) {
-        await api.patch(`/task/${taskId}/finish_task`);
-        loadStats();
+        try {
+            await api.patch(`/task/${taskId}/finish_task`);
+            loadStats();
+        } catch (err) {
+            console.error("Task completion failed:", err);
+        }
     }
 
     const goalProgress = data ? (data.total_goals > 0 ? Math.round((data.completed_goals / data.total_goals) * 100) : 0) : 0;
@@ -50,7 +63,23 @@ function Dashboard(){
                     </p>
                 </header>
 
-                {data && (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+                        <div className="w-10 h-10 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-4"></div>
+                        <p className="animate-pulse text-sm font-medium">Synchronizing statistics ledger...</p>
+                    </div>
+                ) : error ? (
+                    <div className="minimal-card p-6 md:p-8 border border-red-900/40 bg-red-950/5 text-center flex flex-col items-center justify-center gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <p className="text-sm font-semibold text-red-400 max-w-md">{error}</p>
+                        <button 
+                            onClick={loadStats}
+                            className="mt-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                        >
+                            Retry connection
+                        </button>
+                    </div>
+                ) : data && (
                     <>
                         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
                             <Card title="Total Startups" value={data.total_startups} description="Active companies" />
@@ -59,7 +88,6 @@ function Dashboard(){
                             <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} description="Venture velocity" />
                         </section>
 
-                        {/* Daily Focus & Calendar Widget */}
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
                             <div className="minimal-card p-6 md:p-8 flex flex-col gap-4">
                                 <h2 className="text-lg font-bold text-white font-heading">Daily Focus</h2>
