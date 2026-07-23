@@ -17,6 +17,18 @@ function Financials() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [aiFeedback, setAiFeedback] = useState("");
 
+    // Helper to format raw **text** into bold tags
+    function formatMessageContent(content) {
+        if (!content) return "";
+        const parts = content.split(/\*\*([^*]+)\*\*/g);
+        return parts.map((part, index) => {
+            if (index % 2 === 1) {
+                return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
+            }
+            return part;
+        });
+    }
+
     async function loadStartups() {
         try {
             const res = await api.get("/startup/get_startups");
@@ -171,7 +183,7 @@ function Financials() {
                                 <p className="animate-pulse text-xs">Computing MRR & cash projections...</p>
                             </div>
                         ) : aiFeedback ? (
-                            <p className="whitespace-pre-wrap">{aiFeedback}</p>
+                            <p className="whitespace-pre-wrap">{formatMessageContent(aiFeedback)}</p>
                         ) : (
                             <p className="text-zinc-500 text-xs text-center py-6">Request a dynamic AI Runway and CAC audit report.</p>
                         )}
