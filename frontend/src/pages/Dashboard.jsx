@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
+// Loading dashboard stats and managing data
 
 function Dashboard(){
     const [data, setData] = useState(null);
@@ -56,6 +57,46 @@ function Dashboard(){
                             <Card title="Goals Completed" value={`${data.completed_goals}/${data.total_goals}`} description="Strategic milestones" />
                             <Card title="Tasks Completed" value={`${data.completed_tasks}/${data.total_tasks}`} description="Actionable tasks" />
                             <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} description="Venture velocity" />
+                        </section>
+
+                        {/* Daily Focus & Calendar Widget */}
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
+                            <div className="minimal-card p-6 md:p-8 flex flex-col gap-4">
+                                <h2 className="text-lg font-bold text-white font-heading">Daily Focus</h2>
+                                <div className="flex flex-col gap-3">
+                                    {data.pending_goals_list && data.pending_goals_list.length > 0 ? (
+                                        data.pending_goals_list.map(goal => (
+                                            <div key={goal.id} className="p-3.5 bg-zinc-900/60 rounded-xl border border-zinc-800 text-xs">
+                                                <p className="font-bold text-zinc-200 mb-1">{goal.title}</p>
+                                                <span className="text-[10px] text-zinc-500 font-semibold">{goal.startup_name}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-zinc-500 text-xs py-4 text-center">No active goals. Set one to start your focus!</p>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="minimal-card p-6 md:p-8 flex flex-col gap-4">
+                                <h2 className="text-lg font-bold text-white font-heading">Upcoming Milestones</h2>
+                                <div className="flex flex-col gap-3">
+                                    {data.events_list && data.events_list.length > 0 ? (
+                                        data.events_list.map(event => (
+                                            <div key={event.id} className="p-3.5 bg-zinc-900/60 rounded-xl border border-zinc-800 text-xs flex justify-between items-center gap-3">
+                                                <div className="min-w-0">
+                                                    <p className="font-bold text-zinc-200 truncate mb-1">{event.title}</p>
+                                                    <span className="text-[10px] text-zinc-500 font-semibold">{event.startup_name}</span>
+                                                </div>
+                                                <span className="text-[10px] text-white bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded whitespace-nowrap font-bold">
+                                                    {event.date}
+                                                </span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-zinc-500 text-xs py-4 text-center">No upcoming dates scheduled.</p>
+                                    )}
+                                </div>
+                            </div>
                         </section>
 
                         <section className="minimal-card p-6 md:p-8 mb-10">

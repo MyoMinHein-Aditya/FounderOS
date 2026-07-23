@@ -21,8 +21,11 @@ class StartupService:
         self.db.refresh(startup)
         return startup
 
-    def get_all_by_owner(self, owner_id: int) -> list:
-        startups = self.db.query(Startup).filter(Startup.owner_id == owner_id).all()
+    def get_all_by_owner(self, owner_id: int, search: str = None, page: int = 1, limit: int = 10) -> list:
+        query = self.db.query(Startup).filter(Startup.owner_id == owner_id)
+        if search:
+            query = query.filter(Startup.name.ilike(f"%{search}%") | Startup.industry.ilike(f"%{search}%"))
+        startups = query.offset((page - 1) * limit).limit(limit).all()
         return [self._format_startup(s) for s in startups]
 
     def get_by_id(self, startup_id: int, owner_id: int) -> Startup:

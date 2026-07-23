@@ -14,9 +14,9 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user = 
     return {"message": "Task Created", "task_id": new_task.id}
 
 @router.get("/get_tasks/{startup_id}")
-def get_tasks(startup_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def get_tasks(startup_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     service = TaskService(db)
-    return service.get_tasks_by_startup(startup_id, current_user["user_id"])
+    return service.get_tasks_by_startup(startup_id, current_user["user_id"], search, status, page, limit)
 
 @router.patch("/{task_id}/finish_task")
 def finish_task(task_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):

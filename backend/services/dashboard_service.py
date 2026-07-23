@@ -43,6 +43,23 @@ class DashboardService:
             "status": t.status
         } for t in upcoming_tasks]
 
+        from models.calendar_event import CalendarEvent
+        from models.goal import Goal
+        upcoming_events = self.db.query(CalendarEvent).join(Startup).filter(Startup.owner_id == user_id).order_by(CalendarEvent.date.asc()).limit(3).all()
+        events_list = [{
+            "id": e.id,
+            "title": e.title,
+            "date": e.date,
+            "startup_name": self.db.query(Startup).filter(Startup.id == e.startup_id).first().name
+        } for e in upcoming_events]
+
+        pending_goals = self.db.query(Goal).join(Startup).filter(Startup.owner_id == user_id, Goal.status == "Pending").order_by(Goal.id.asc()).limit(3).all()
+        pending_goals_list = [{
+            "id": g.id,
+            "title": g.title,
+            "startup_name": self.db.query(Startup).filter(Startup.id == g.startup_id).first().name
+        } for g in pending_goals]
+
         return {
             "total_startups": total_startups,
             "total_goals": total_goals,
@@ -50,5 +67,7 @@ class DashboardService:
             "total_tasks": total_tasks,
             "completed_tasks": completed_tasks,
             "recent_stuff": recent_stuff,
-            "todos": todos
+            "todos": todos,
+            "pending_goals_list": pending_goals_list,
+            "events_list": events_list
         }

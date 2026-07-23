@@ -1,11 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import api from "../api/axios";
+import { useTheme } from "../context/ThemeContext";
 
 function Navbar(){
     const location = useLocation();
+    const { theme, toggleTheme } = useTheme();
     const [user, setUser] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifications, setShowNotifications] = useState(false);
     const sidebarRef = useRef(null);
     
     function logout(){
@@ -22,8 +26,27 @@ function Navbar(){
         }
     }
 
+    async function loadNotifications() {
+        try {
+            const res = await api.get("/notifications/get_unread");
+            setNotifications(res.data);
+        } catch (err) {
+            // Silence if endpoint not yet loaded
+        }
+    }
+
+    async function markAllRead() {
+        try {
+            await api.post("/notifications/read_all");
+            setNotifications([]);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     useEffect(() => {
         loadUser();
+        loadNotifications();
 
         function handleClickOutside(event) {
             if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -41,6 +64,9 @@ function Navbar(){
         { path: "/startup", label: "Startups" },
         { path: "/goal", label: "Goals" },
         { path: "/task", label: "Tasks" },
+        { path: "/notes", label: "Notes" },
+        { path: "/documents", label: "Documents" },
+        { path: "/calendar", label: "Calendar" },
         { path: "/ai", label: "AI Assistant" },
         { path: "/settings", label: "Settings" }
     ];
@@ -76,13 +102,61 @@ function Navbar(){
                         <span className="text-2xl font-extrabold text-gradient font-heading tracking-tight">
                             FounderOS
                         </span>
-                        <button 
-                            className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            ✕
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                onClick={toggleTheme}
+                                className="px-2 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-bold rounded-lg text-[10px] transition-all cursor-pointer"
+                                title="Toggle Theme"
+                            >
+                                {theme === "dark" ? "Light" : "Dark"}
+                            </button>
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className="relative px-2 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-bold rounded-lg text-[10px] transition-all cursor-pointer"
+                                title="Notifications"
+                            >
+                                Alerts
+                                {notifications.length > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-white text-zinc-950 text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
+                                        {notifications.length}
+                                    </span>
+                                )}
+                            </button>
+                            <button 
+                                className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer ml-1"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                ✕
+                            </button>
+                        </div>
                     </div>
+
+                    {showNotifications && (
+                        <div className="mb-6 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-xs flex flex-col gap-2">
+                            <div className="flex justify-between items-center pb-2 border-b border-zinc-800/60">
+                                <span className="font-bold text-zinc-200">Alerts</span>
+                                {notifications.length > 0 && (
+                                    <button 
+                                        onClick={markAllRead}
+                                        className="text-[10px] text-white hover:underline cursor-pointer font-bold"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                            <div className="max-h-40 overflow-y-auto flex flex-col gap-2 pr-1">
+                                {notifications.length === 0 ? (
+                                    <p className="text-zinc-500 text-center py-2">No new alerts</p>
+                                ) : (
+                                    notifications.map((n) => (
+                                        <div key={n.id} className="p-2 rounded bg-zinc-950 border border-zinc-900 text-zinc-300">
+                                            {n.message}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    )}
                     
                     <nav className="flex flex-col gap-1.5">
                         {navItems.map((item) => {

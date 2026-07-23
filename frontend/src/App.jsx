@@ -6,6 +6,8 @@ import {
   Navigate
 } from "react-router-dom";
 import api from "./api/axios";
+import { ThemeProvider } from "./context/ThemeContext";
+import { ToastProvider } from "./context/ToastContext";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -15,7 +17,11 @@ import Goals from "./pages/Goals";
 import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
 import AI from "./pages/AI";
+import Notes from "./pages/Notes";
+import Documents from "./pages/Documents";
+import CalendarView from "./pages/CalendarView";
 
+// Protecting routes with authentication check
 
 function AuthCheck({ children }) {
   const [authorized, setAuthorized] = useState(null);
@@ -52,27 +58,26 @@ function AuthCheck({ children }) {
 }
 
 function App(){
-  useEffect(() => {
-    const theme = localStorage.getItem("theme") || "dark";
-    if (theme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-  }, []);
   return(
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login/>}/>
-        <Route path="/register" element={<Register/>}/>
-        <Route path="/dashboard" element={<AuthCheck><Dashboard/></AuthCheck>}/>
-        <Route path="/startup" element={<AuthCheck><Startup/></AuthCheck>}/>
-        <Route path="/goal" element={<AuthCheck><Goals/></AuthCheck>}/>
-        <Route path="/task" element={<AuthCheck><Tasks/></AuthCheck>}/>
-        <Route path="/settings" element={<AuthCheck><Settings/></AuthCheck>}/>
-        <Route path="/ai" element={<AuthCheck><AI/></AuthCheck>}/>
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login/>}/>
+            <Route path="/register" element={<Register/>}/>
+            <Route path="/dashboard" element={<AuthCheck><Dashboard/></AuthCheck>}/>
+            <Route path="/startup" element={<AuthCheck><Startup/></AuthCheck>}/>
+            <Route path="/goal" element={<AuthCheck><Goals/></AuthCheck>}/>
+            <Route path="/task" element={<AuthCheck><Tasks/></AuthCheck>}/>
+            <Route path="/settings" element={<AuthCheck><Settings/></AuthCheck>}/>
+            <Route path="/ai" element={<AuthCheck><AI/></AuthCheck>}/>
+            <Route path="/notes" element={<AuthCheck><Notes/></AuthCheck>}/>
+            <Route path="/documents" element={<AuthCheck><Documents/></AuthCheck>}/>
+            <Route path="/calendar" element={<AuthCheck><CalendarView/></AuthCheck>}/>
+          </Routes>
+        </BrowserRouter>
+      </ToastProvider>
+    </ThemeProvider>
   )
 }
 

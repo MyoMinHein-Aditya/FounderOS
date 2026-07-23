@@ -30,11 +30,16 @@ class TaskService:
         self.db.refresh(task)
         return task
 
-    def get_tasks_by_startup(self, startup_id: int, owner_id: int) -> list:
+    def get_tasks_by_startup(self, startup_id: int, owner_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10) -> list:
         startup = self.db.query(Startup).filter(Startup.id == startup_id, Startup.owner_id == owner_id).first()
         if not startup:
             raise HTTPException(status_code=403, detail="Startup not found or not owned by user")
-        return self.db.query(Task).filter(Task.startup_id == startup_id).all()
+        query = self.db.query(Task).filter(Task.startup_id == startup_id)
+        if search:
+            query = query.filter(Task.title.ilike(f"%{search}%"))
+        if status:
+            query = query.filter(Task.status == status)
+        return query.offset((page - 1) * limit).limit(limit).all()
 
     def complete(self, task_id: int, owner_id: int) -> bool:
         task = self.db.query(Task).join(Startup).filter(Task.id == task_id, Startup.owner_id == owner_id).first()
