@@ -109,22 +109,22 @@ function Navbar(){
                         <span className="text-2xl font-extrabold text-gradient font-heading tracking-tight">
                             FounderOS
                         </span>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={toggleTheme}
-                                className="px-2 py-1 bg-transparent border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-strong)] font-bold rounded-lg text-[10px] transition-all cursor-pointer"
+                                className="text-[10px] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                                 title="Toggle Theme"
                             >
                                 {theme === "dark" ? "Light" : "Dark"}
                             </button>
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className="relative px-2 py-1 bg-transparent border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-strong)] font-bold rounded-lg text-[10px] transition-all cursor-pointer"
+                                className="relative text-[10px] font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                                 title="Notifications"
                             >
                                 Alerts
                                 {notifications.length > 0 && (
-                                    <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[var(--text-primary)] text-[var(--bg-canvas)] text-[9px] font-bold rounded-full flex items-center justify-center border border-[var(--text-primary)]">
+                                    <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 bg-[var(--text-primary)] text-[var(--bg-canvas)] text-[8px] font-extrabold rounded-full flex items-center justify-center">
                                         {notifications.length}
                                     </span>
                                 )}
