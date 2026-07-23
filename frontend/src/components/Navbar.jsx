@@ -64,9 +64,13 @@ function Navbar(){
         { path: "/startup", label: "Startups" },
         { path: "/goal", label: "Goals" },
         { path: "/task", label: "Tasks" },
+        { path: "/kanban", label: "Kanban Board" },
         { path: "/notes", label: "Notes" },
         { path: "/documents", label: "Documents" },
         { path: "/calendar", label: "Calendar" },
+        { path: "/financials", label: "Financials" },
+        { path: "/crm", label: "CRM Pipeline" },
+        { path: "/whiteboard", label: "Whiteboard" },
         { path: "/team", label: "Team" },
         { path: "/ai", label: "AI Assistant" },
         { path: "/settings", label: "Settings" }

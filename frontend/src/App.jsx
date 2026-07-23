@@ -21,6 +21,10 @@ import Notes from "./pages/Notes";
 import Documents from "./pages/Documents";
 import CalendarView from "./pages/CalendarView";
 import Team from "./pages/Team";
+import Kanban from "./pages/Kanban";
+import Financials from "./pages/Financials";
+import CRM from "./pages/CRM";
+import Whiteboard from "./pages/Whiteboard";
 
 // Protecting routes with authentication check
 
@@ -76,6 +80,10 @@ function App(){
             <Route path="/documents" element={<AuthCheck><Documents/></AuthCheck>}/>
             <Route path="/calendar" element={<AuthCheck><CalendarView/></AuthCheck>}/>
             <Route path="/team" element={<AuthCheck><Team/></AuthCheck>}/>
+            <Route path="/kanban" element={<AuthCheck><Kanban/></AuthCheck>}/>
+            <Route path="/financials" element={<AuthCheck><Financials/></AuthCheck>}/>
+            <Route path="/crm" element={<AuthCheck><CRM/></AuthCheck>}/>
+            <Route path="/whiteboard" element={<AuthCheck><Whiteboard/></AuthCheck>}/>
           </Routes>
         </BrowserRouter>
       </ToastProvider>
