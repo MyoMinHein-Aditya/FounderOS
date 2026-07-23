@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
+import { useTheme } from "../context/ThemeContext";
 
 function Settings(){
     const [user, setUser] = useState(null);
-    const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+    const { theme, setTheme } = useTheme();
 
     async function loadUser(){
         try {
@@ -21,12 +22,6 @@ function Settings(){
 
     function changeTheme(newTheme) {
         setTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
-        if (newTheme === "light") {
-            document.documentElement.classList.add("light");
-        } else {
-            document.documentElement.classList.remove("light");
-        }
     }
 
     function logout(){
@@ -104,6 +99,7 @@ function Settings(){
 
                             <button 
                                 className="w-full px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 font-semibold rounded-xl transition-all cursor-pointer text-xs"
+                                onClick={() => window.dispatchEvent(new Event("open-notifications"))}
                             >
                                 Notifications
                             </button>
