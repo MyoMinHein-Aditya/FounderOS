@@ -14,11 +14,37 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  if (import.meta.env.DEV) {
+      config.metadata = { startTime: new Date().getTime() };
+      const traceId = Math.random().toString(36).substring(2, 9);
+      config.headers['X-Trace-Id'] = traceId;
+  }
+  
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+      if (import.meta.env.DEV && response.config.metadata) {
+          const duration = new Date().getTime() - response.config.metadata.startTime;
+          const traceId = response.config.headers['X-Trace-Id'];
+          
+          fetch('/__brain_webhook', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  traceId,
+                  source: 'frontend',
+                  target: response.config.url,
+                  type: 'API_CALL',
+                  duration,
+                  status: response.status
+              })
+          }).catch(() => {}); // ignore trace failures
+      }
+      return response;
+  },
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");

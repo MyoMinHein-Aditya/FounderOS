@@ -1,4 +1,8 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
+import time
+import requests
+import json
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from database.db import engine
 from database.base import Base
@@ -31,6 +35,35 @@ from routes.crm import router as crm_router
 from middleware.rate_limit import rate_limit_middleware
 
 app = FastAPI(dependencies=[Depends(rate_limit_middleware)])
+
+@app.middleware("http")
+async def brain_trace_middleware(request: Request, call_next):
+    trace_id = request.headers.get("X-Trace-Id")
+    start_time = time.time()
+    
+    response = await call_next(request)
+    
+    if trace_id and os.getenv("ENVIRONMENT", "dev") == "dev":
+        duration = (time.time() - start_time) * 1000
+        try:
+            # Clean up the path for matching (e.g. remove /api prefix if present, but we just use route.path)
+            target = request.url.path
+            requests.post(
+                "http://localhost:5173/__brain_webhook",
+                json={
+                    "traceId": trace_id,
+                    "source": "api_gateway",
+                    "target": target,
+                    "type": "API_CALL",
+                    "duration": duration,
+                    "status": response.status_code
+                },
+                timeout=0.1
+            )
+        except Exception:
+            pass
+            
+    return response
 
 Base.metadata.create_all(bind=engine)
 

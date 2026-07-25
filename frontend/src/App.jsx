@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -26,6 +26,8 @@ import Financials from "./pages/Financials";
 import CRM from "./pages/CRM";
 import Whiteboard from "./pages/Whiteboard";
 
+const BrainOverlay = import.meta.env.DEV ? lazy(() => import("../devtools/brain/BrainOverlay")) : () => null;
+
 // Protecting routes with authentication check
 
 function AuthCheck({ children }) {
@@ -48,8 +50,8 @@ function AuthCheck({ children }) {
 
   if (authorized === null) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center text-zinc-500">
-        <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-4"></div>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-muted-foreground">
+        <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-4"></div>
         <p className="animate-pulse text-sm font-medium">Verifying access credentials...</p>
       </div>
     );
@@ -85,6 +87,9 @@ function App(){
             <Route path="/crm" element={<AuthCheck><CRM/></AuthCheck>}/>
             <Route path="/whiteboard" element={<AuthCheck><Whiteboard/></AuthCheck>}/>
           </Routes>
+          <Suspense fallback={null}>
+            {import.meta.env.DEV && <BrainOverlay />}
+          </Suspense>
         </BrowserRouter>
       </ToastProvider>
     </ThemeProvider>

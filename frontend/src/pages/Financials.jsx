@@ -24,18 +24,18 @@ function Financials() {
         return lines.map((line, lineIndex) => {
             const trimmed = line.trim();
             if (trimmed.startsWith("### ")) {
-                return <h3 key={lineIndex} className="text-sm font-bold text-white mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
+                return <h3 key={lineIndex} className="text-sm font-bold text-foreground mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
             }
             if (trimmed.startsWith("## ")) {
-                return <h2 key={lineIndex} className="text-base font-bold text-white mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
+                return <h2 key={lineIndex} className="text-base font-bold text-foreground mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
             }
             if (trimmed.startsWith("# ")) {
-                return <h1 key={lineIndex} className="text-lg font-extrabold text-white mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
+                return <h1 key={lineIndex} className="text-lg font-extrabold text-foreground mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
             }
             if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
                 return (
                     <ul key={lineIndex} className="list-disc pl-5 mb-1.5 space-y-1">
-                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(trimmed.substring(2))}</li>
+                        <li className="text-xs md:text-sm text-muted-foreground">{parseInline(trimmed.substring(2))}</li>
                     </ul>
                 );
             }
@@ -43,14 +43,14 @@ function Financials() {
             if (matchNum) {
                 return (
                     <ol key={lineIndex} className="list-decimal pl-5 mb-1.5 space-y-1">
-                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(matchNum[2])}</li>
+                        <li className="text-xs md:text-sm text-muted-foreground">{parseInline(matchNum[2])}</li>
                     </ol>
                 );
             }
             if (trimmed === "") {
                 return <div key={lineIndex} className="h-2"></div>;
             }
-            return <p key={lineIndex} className="text-xs md:text-sm text-zinc-300 leading-relaxed mb-2">{parseInline(line)}</p>;
+            return <p key={lineIndex} className="text-xs md:text-sm text-muted-foreground leading-relaxed mb-2">{parseInline(line)}</p>;
         });
     }
 
@@ -59,7 +59,7 @@ function Financials() {
         const parts = text.split(/\*\*([^*]+)\*\*/g);
         return parts.map((part, index) => {
             if (index % 2 === 1) {
-                return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
+                return <strong key={index} className="font-bold text-foreground html.light:text-zinc-950">{part}</strong>;
             }
             return part;
         });
@@ -102,7 +102,7 @@ function Financials() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -110,7 +110,7 @@ function Financials() {
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                             Financial Dashboard
                         </h1>
-                        <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
                             Manage runways, compute customer retention unit economics, and consult AI.
                         </p>
                     </div>
@@ -121,7 +121,7 @@ function Financials() {
                             onChange={(e) => setSelectedStartupId(e.target.value)}
                         >
                             {startups.map(s => (
-                                <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                             ))}
                         </select>
                     </div>
@@ -130,9 +130,9 @@ function Financials() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
                     {/* Metrics inputs */}
                     <section className="minimal-card p-6 md:p-8 flex flex-col gap-4">
-                        <h2 className="text-lg font-bold text-white font-heading">Venture Ledger</h2>
+                        <h2 className="text-lg font-bold text-foreground font-heading">Venture Ledger</h2>
                         <div className="flex flex-col gap-3">
-                            <label className="text-xs text-zinc-400 font-semibold">Cash Balance ($)</label>
+                            <label className="text-xs text-muted-foreground font-semibold">Cash Balance ($)</label>
                             <input 
                                 className="minimal-input"
                                 type="number" 
@@ -140,7 +140,7 @@ function Financials() {
                                 onChange={(e) => setCash(Number(e.target.value))}
                             />
                             
-                            <label className="text-xs text-zinc-400 font-semibold">Monthly MRR ($)</label>
+                            <label className="text-xs text-muted-foreground font-semibold">Monthly MRR ($)</label>
                             <input 
                                 className="minimal-input"
                                 type="number" 
@@ -148,7 +148,7 @@ function Financials() {
                                 onChange={(e) => setMrr(Number(e.target.value))}
                             />
                             
-                            <label className="text-xs text-zinc-400 font-semibold">Monthly Burn ($)</label>
+                            <label className="text-xs text-muted-foreground font-semibold">Monthly Burn ($)</label>
                             <input 
                                 className="minimal-input"
                                 type="number" 
@@ -156,7 +156,7 @@ function Financials() {
                                 onChange={(e) => setBurn(Number(e.target.value))}
                             />
                             
-                            <label className="text-xs text-zinc-400 font-semibold">CAC ($)</label>
+                            <label className="text-xs text-muted-foreground font-semibold">CAC ($)</label>
                             <input 
                                 className="minimal-input"
                                 type="number" 
@@ -164,7 +164,7 @@ function Financials() {
                                 onChange={(e) => setCac(Number(e.target.value))}
                             />
                             
-                            <label className="text-xs text-zinc-400 font-semibold">LTV ($)</label>
+                            <label className="text-xs text-muted-foreground font-semibold">LTV ($)</label>
                             <input 
                                 className="minimal-input"
                                 type="number" 
@@ -178,22 +178,22 @@ function Financials() {
                     <section className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="minimal-card p-6 md:p-8 flex flex-col justify-between">
                             <div>
-                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Runway Projection</span>
-                                <h3 className="text-5xl font-extrabold text-white mt-4 font-heading">{runway}</h3>
-                                <p className="text-xs text-zinc-400 font-medium mt-2">months of cash remaining</p>
+                                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Runway Projection</span>
+                                <h3 className="text-5xl font-extrabold text-foreground mt-4 font-heading">{runway}</h3>
+                                <p className="text-xs text-muted-foreground font-medium mt-2">months of cash remaining</p>
                             </div>
-                            <div className="text-xs text-zinc-500 font-medium leading-relaxed pt-4 border-t border-zinc-900 mt-4">
+                            <div className="text-xs text-muted-foreground font-medium leading-relaxed pt-4 border-t border-zinc-900 mt-4">
                                 Keep runway above 12-18 months for fundraising cycles.
                             </div>
                         </div>
 
                         <div className="minimal-card p-6 md:p-8 flex flex-col justify-between">
                             <div>
-                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">LTV to CAC Ratio</span>
-                                <h3 className="text-5xl font-extrabold text-white mt-4 font-heading">{ltvCacRatio}x</h3>
-                                <p className="text-xs text-zinc-400 font-medium mt-2">customer acquisition return</p>
+                                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">LTV to CAC Ratio</span>
+                                <h3 className="text-5xl font-extrabold text-foreground mt-4 font-heading">{ltvCacRatio}x</h3>
+                                <p className="text-xs text-muted-foreground font-medium mt-2">customer acquisition return</p>
                             </div>
-                            <div className="text-xs text-zinc-500 font-medium leading-relaxed pt-4 border-t border-zinc-900 mt-4">
+                            <div className="text-xs text-muted-foreground font-medium leading-relaxed pt-4 border-t border-zinc-900 mt-4">
                                 Healthy startups target an LTV:CAC ratio exceeding 3.0x.
                             </div>
                         </div>
@@ -203,7 +203,7 @@ function Financials() {
                 {/* AI Analyst Feedback */}
                 <div className="minimal-card p-6 md:p-8">
                     <div className="flex justify-between items-center gap-4 mb-6">
-                        <h2 className="text-lg font-bold text-white font-heading">AI Financial Analysis</h2>
+                        <h2 className="text-lg font-bold text-foreground font-heading">AI Financial Analysis</h2>
                         <button 
                             className="btn-primary py-2 px-5 text-xs"
                             onClick={handleRunAIAnalysis}
@@ -212,16 +212,16 @@ function Financials() {
                             {isAnalyzing ? "Analyzing..." : "Generate report"}
                         </button>
                     </div>
-                    <div className="bg-zinc-900/40 p-5 rounded-xl border border-zinc-800 text-sm leading-relaxed text-zinc-300 font-mono">
+                    <div className="bg-muted p-5 rounded-xl border border-border text-sm leading-relaxed text-muted-foreground font-mono">
                         {isAnalyzing ? (
-                            <div className="flex flex-col items-center justify-center py-6 text-zinc-500">
-                                <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-2"></div>
+                            <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                                <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-2"></div>
                                 <p className="animate-pulse text-xs">Computing MRR & cash projections...</p>
                             </div>
                         ) : aiFeedback ? (
                             <div className="leading-relaxed">{renderMarkdown(aiFeedback)}</div>
                         ) : (
-                            <p className="text-zinc-500 text-xs text-center py-6">Request a dynamic AI Runway and CAC audit report.</p>
+                            <p className="text-muted-foreground text-xs text-center py-6">Request a dynamic AI Runway and CAC audit report.</p>
                         )}
                     </div>
                 </div>

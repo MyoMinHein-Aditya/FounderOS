@@ -144,14 +144,14 @@ function Tasks() {
     const filteredGoals = goals.filter(g => g.startup_id === Number(form.startup_id));
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                         Venture Tasks
                     </h1>
-                    <p className="text-zinc-400 text-sm md:text-base font-medium">
+                    <p className="text-muted-foreground text-sm md:text-base font-medium">
                         Execute key milestones and collaborate with teammates.
                     </p>
                 </header>
@@ -160,7 +160,7 @@ function Tasks() {
                     {/* Left creation panel */}
                     <div className="flex flex-col gap-6">
                         <section className="minimal-card p-6 md:p-8 h-fit">
-                            <h2 className="text-lg font-bold text-white font-heading mb-6">Create Task</h2>
+                            <h2 className="text-lg font-bold text-foreground font-heading mb-6">Create Task</h2>
                             <div className="flex flex-col gap-4">
                                 <select 
                                     className="minimal-input cursor-pointer"
@@ -171,9 +171,9 @@ function Tasks() {
                                         loadTasks(e.target.value, search, statusFilter, 1);
                                     }}
                                 >
-                                    <option value="" className="bg-zinc-950 text-zinc-400">Select Startup</option>
+                                    <option value="" className="bg-background text-muted-foreground">Select Startup</option>
                                     {startups.map(s => (
-                                        <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                        <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                                     ))}
                                 </select>
                                 
@@ -189,9 +189,9 @@ function Tasks() {
                                     value={form.goal_id} 
                                     onChange={(e) => setForm({ ...form, goal_id: e.target.value })}
                                 >
-                                    <option value="" className="bg-zinc-950 text-zinc-400">Select Goal</option>
+                                    <option value="" className="bg-background text-muted-foreground">Select Goal</option>
                                     {filteredGoals.map(g => (
-                                        <option key={g.id} value={g.id} className="bg-zinc-950 text-zinc-100">{g.title}</option>
+                                        <option key={g.id} value={g.id} className="bg-background text-foreground">{g.title}</option>
                                     ))}
                                 </select>
                                 
@@ -208,7 +208,7 @@ function Tasks() {
                     {/* Middle list panel */}
                     <section className="lg:col-span-2 flex flex-col gap-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 className="text-lg font-bold text-white font-heading">Tasks List</h2>
+                            <h2 className="text-lg font-bold text-foreground font-heading">Tasks List</h2>
                             
                             {form.startup_id && (
                                 <div className="flex items-center gap-2.5">
@@ -223,21 +223,21 @@ function Tasks() {
                                         value={statusFilter}
                                         onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                                     >
-                                        <option value="" className="bg-zinc-950 text-zinc-100">All</option>
-                                        <option value="Pending" className="bg-zinc-950 text-zinc-100">Pending</option>
-                                        <option value="Completed" className="bg-zinc-950 text-zinc-100">Completed</option>
+                                        <option value="" className="bg-background text-foreground">All</option>
+                                        <option value="Pending" className="bg-background text-foreground">Pending</option>
+                                        <option value="Completed" className="bg-background text-foreground">Completed</option>
                                     </select>
                                 </div>
                             )}
                         </div>
 
                         {!form.startup_id ? (
-                            <div className="flex flex-col items-center justify-center text-center p-12 bg-zinc-900/40 rounded-2xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                            <div className="flex flex-col items-center justify-center text-center p-12 bg-muted rounded-2xl border  border-border text-muted-foreground text-sm">
                                 <p className="mb-2 font-medium">Select a startup</p>
                                 <p className="text-xs">to view and create tasks</p>
                             </div>
                         ) : tasks.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center text-center p-12 bg-zinc-900/40 rounded-2xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                            <div className="flex flex-col items-center justify-center text-center p-12 bg-muted rounded-2xl border  border-border text-muted-foreground text-sm">
                                 <p className="mb-2 font-medium">No matching tasks found</p>
                                 <p className="text-xs">Refine your filters or create a new task</p>
                             </div>
@@ -250,12 +250,12 @@ function Tasks() {
                                             onClick={() => handleSelectTask(task)}
                                             className={`minimal-card p-6 md:p-8 flex flex-col justify-between cursor-pointer border transition-all duration-200 ${
                                                 selectedTask && selectedTask.id === task.id
-                                                    ? "border-white bg-zinc-900"
-                                                    : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/60"
+                                                    ? "border-white bg-muted"
+                                                    : "border-border hover:border-border bg-muted"
                                             }`}
                                         >
                                             <div className="mb-4">
-                                                <h3 className="text-lg md:text-xl font-bold text-white font-heading mb-2">{task.title}</h3>
+                                                <h3 className="text-lg md:text-xl font-bold text-foreground font-heading mb-2">{task.title}</h3>
                                                 <Badge status={task.status === "Completed" ? "completed" : "pending"} label={task.status === "Completed" ? "Complete" : "Pending"} />
                                             </div>
                                             
@@ -278,17 +278,17 @@ function Tasks() {
 
                 {/* Collaboration Task Comments Slide-over drawer */}
                 {selectedTask && (
-                    <div className="fixed inset-0 z-50 bg-black/80 flex justify-end">
-                        <div className="w-full max-w-md h-full bg-zinc-950 border-l border-zinc-900 flex flex-col p-6 shadow-2xl">
+                    <div className="fixed inset-0 z-50 bg-background/80 flex justify-end">
+                        <div className="w-full max-w-md h-full bg-background border-l border-zinc-900 flex flex-col p-6 shadow-2xl">
                             <div className="flex justify-between items-center pb-4 border-b border-zinc-900 mb-6">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white font-heading truncate max-w-[280px]">
+                                    <h3 className="text-lg font-bold text-foreground font-heading truncate max-w-[280px]">
                                         {selectedTask.title}
                                     </h3>
-                                    <span className="text-[10px] text-zinc-500 font-semibold">Discussion thread</span>
+                                    <span className="text-[10px] text-muted-foreground font-semibold">Discussion thread</span>
                                 </div>
                                 <button 
-                                    className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer font-bold"
+                                    className="text-muted-foreground hover:text-muted-foreground text-lg cursor-pointer font-bold"
                                     onClick={() => setSelectedTask(null)}
                                 >
                                     ✕
@@ -298,17 +298,17 @@ function Tasks() {
                             {/* Comments Log */}
                             <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
                                 {comments.length === 0 ? (
-                                    <p className="text-zinc-500 text-xs text-center py-12">No comments written yet. Start the conversation below!</p>
+                                    <p className="text-muted-foreground text-xs text-center py-12">No comments written yet. Start the conversation below!</p>
                                 ) : (
                                     comments.map(c => (
-                                        <div key={c.id} className="p-3 bg-zinc-900 rounded-xl border border-zinc-800 flex flex-col gap-1">
+                                        <div key={c.id} className="p-3 bg-muted rounded-xl border border-border flex flex-col gap-1">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-white">{c.username}</span>
-                                                <span className="text-[9px] text-zinc-500 font-semibold">
+                                                <span className="text-xs font-bold text-foreground">{c.username}</span>
+                                                <span className="text-[9px] text-muted-foreground font-semibold">
                                                     {new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             </div>
-                                            <p className="text-xs text-zinc-300 leading-relaxed font-medium">{c.content}</p>
+                                            <p className="text-xs text-muted-foreground leading-relaxed font-medium">{c.content}</p>
                                         </div>
                                     ))
                                 )}

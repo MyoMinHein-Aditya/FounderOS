@@ -74,7 +74,7 @@ function CalendarView() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -82,7 +82,7 @@ function CalendarView() {
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                             Venture Calendar
                         </h1>
-                        <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
                             Monitor launch target deadlines, investor calls, and task deadlines.
                         </p>
                     </div>
@@ -93,7 +93,7 @@ function CalendarView() {
                             onChange={(e) => setSelectedStartupId(e.target.value)}
                         >
                             {startups.map(s => (
-                                <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                             ))}
                         </select>
                     </div>
@@ -102,7 +102,7 @@ function CalendarView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Add Event Form */}
                     <section className="minimal-card p-6 md:p-8 h-fit">
-                        <h2 className="text-lg font-bold text-white font-heading mb-6">Add Event</h2>
+                        <h2 className="text-lg font-bold text-foreground font-heading mb-6">Add Event</h2>
                         <div className="flex flex-col gap-4">
                             <input 
                                 className="minimal-input"
@@ -134,22 +134,22 @@ function CalendarView() {
 
                     {/* Timeline List */}
                     <section className="lg:col-span-2 minimal-card p-6 md:p-8">
-                        <h2 className="text-lg font-bold text-white font-heading mb-6">Timeline Events</h2>
+                        <h2 className="text-lg font-bold text-foreground font-heading mb-6">Timeline Events</h2>
                         {events.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center text-center p-12 bg-zinc-900/40 rounded-2xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                            <div className="flex flex-col items-center justify-center text-center p-12 bg-muted rounded-2xl border  border-border text-muted-foreground text-sm">
                                 <p className="mb-2 font-medium">No events added yet</p>
                                 <p className="text-xs">Schedule your first milestone deadline on the left</p>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
                                 {events.map(event => (
-                                    <div key={event.id} className="flex items-start justify-between p-4 bg-zinc-900/60 rounded-xl border border-zinc-800 transition-all duration-200">
+                                    <div key={event.id} className="flex items-start justify-between p-4 bg-muted rounded-xl border border-border transition-all duration-200">
                                         <div className="flex flex-col gap-1 min-w-0">
-                                            <span className="text-sm font-bold text-zinc-100 truncate">{event.title}</span>
+                                            <span className="text-sm font-bold text-foreground truncate">{event.title}</span>
                                             {event.description && (
-                                                <p className="text-xs text-zinc-400 font-medium truncate">{event.description}</p>
+                                                <p className="text-xs text-muted-foreground font-medium truncate">{event.description}</p>
                                             )}
-                                            <span className="text-[10px] text-zinc-500 font-semibold mt-1">Date: {event.date}</span>
+                                            <span className="text-[10px] text-muted-foreground font-semibold mt-1">Date: {event.date}</span>
                                         </div>
                                         <button 
                                             className="px-2.5 py-1 text-[10px] font-bold text-red-400 bg-red-950/20 border border-red-900/40 rounded hover:bg-red-900/40 transition-all cursor-pointer whitespace-nowrap ml-2"

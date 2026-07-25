@@ -95,27 +95,29 @@ function Navbar(){
     return (
         <>
             {/* Global Top Bar Header */}
-            <header className="fixed top-0 left-0 right-0 h-16 bg-[var(--bg-canvas)] border-b border-[var(--border)] z-30 flex items-center justify-between px-6">
+            <header className="fixed top-0 left-0 right-0 h-16 bg-background border-b border-border z-30 flex items-center justify-between px-6">
                 <div className="flex items-center gap-4">
                     <button 
                         id="sidebar-trigger"
                         onClick={() => setIsOpen(true)}
-                        className="p-2 rounded-xl hover:bg-[var(--surface-strong)] text-[var(--text-primary)] transition-all cursor-pointer flex items-center justify-center text-lg border border-transparent"
+                        className="p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center justify-center text-lg border border-transparent aria-expanded={isOpen}"
                         aria-label="Open Sidebar"
+                        aria-expanded={isOpen}
                     >
                         ☰
                     </button>
-                    <span className="text-xl font-extrabold text-gradient font-heading tracking-tight">
+                    <span className="text-xl font-extrabold text-foreground font-heading tracking-tight">
                         FounderOS
                     </span>
                 </div>
                 
                 <div className="flex items-center gap-2 relative" ref={notificationsRef}>
-                    {/* Theme Toggle Button using SVG paths */}
+                    {/* Theme Toggle Button */}
                     <button
                         onClick={toggleTheme}
-                        className="p-2 rounded-xl hover:bg-[var(--surface-strong)] text-[var(--text-primary)] transition-all cursor-pointer flex items-center justify-center border border-transparent"
+                        className="p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center justify-center border border-transparent"
                         title="Toggle Theme"
+                        aria-label="Toggle Theme"
                     >
                         {theme === "dark" ? (
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -131,27 +133,29 @@ function Navbar(){
                     {/* Notification Bell Button */}
                     <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className="relative p-2 rounded-xl hover:bg-[var(--surface-strong)] text-[var(--text-primary)] transition-all cursor-pointer flex items-center justify-center border border-transparent"
+                        className="relative p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center justify-center border border-transparent"
                         title="Notifications"
+                        aria-label="Notifications"
+                        aria-expanded={showNotifications}
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         {notifications.length > 0 && (
-                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full flex items-center justify-center border border-[var(--bg-canvas)]">
+                            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-destructive rounded-full flex items-center justify-center border border-background">
                             </span>
                         )}
                     </button>
                     
                     {/* Notification Dropdown Panel */}
                     {showNotifications && (
-                        <div className="absolute top-12 right-0 w-80 p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-xs flex flex-col gap-2 shadow-2xl z-50">
-                            <div className="flex justify-between items-center pb-2 border-b border-[var(--border)]">
-                                <span className="font-bold text-[var(--text-primary)]">Alerts</span>
+                        <div className="absolute top-14 right-0 w-80 p-4 rounded-xl bg-popover border border-border text-popover-foreground text-sm flex flex-col gap-2 shadow-lg z-50">
+                            <div className="flex justify-between items-center pb-3 border-b border-border">
+                                <span className="font-semibold">Alerts</span>
                                 {notifications.length > 0 && (
                                     <button 
                                         onClick={markAllRead}
-                                        className="text-[10px] text-[var(--text-primary)] hover:underline cursor-pointer font-bold"
+                                        className="text-xs text-muted-foreground hover:text-foreground cursor-pointer font-medium transition-colors"
                                     >
                                         Clear All
                                     </button>
@@ -159,10 +163,10 @@ function Navbar(){
                             </div>
                             <div className="max-h-60 overflow-y-auto flex flex-col gap-2 pr-1">
                                 {notifications.length === 0 ? (
-                                    <p className="text-[var(--text-muted)] text-center py-4">No new alerts</p>
+                                    <p className="text-muted-foreground text-center py-6 text-sm">No new alerts</p>
                                 ) : (
                                     notifications.map((n) => (
-                                        <div key={n.id} className="p-2.5 rounded-xl bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--text-secondary)]">
+                                        <div key={n.id} className="p-3 rounded-lg bg-muted border border-border text-foreground text-sm">
                                             {n.message}
                                         </div>
                                     ))
@@ -176,7 +180,7 @@ function Navbar(){
             {/* Sidebar Drawer Overlay */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/80 z-40 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/60 z-40 transition-opacity duration-300"
                     onClick={() => setIsOpen(false)}
                 ></div>
             )}
@@ -184,24 +188,25 @@ function Navbar(){
             {/* Sidebar Drawer */}
             <aside 
                 ref={sidebarRef}
-                className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[var(--bg-canvas)] border-r border-[var(--border)] flex flex-col justify-between p-6 transition-transform duration-300 ease-in-out ${
+                className={`fixed top-0 left-0 z-50 w-64 h-screen bg-background border-r border-border flex flex-col justify-between p-6 transition-transform duration-300 ease-in-out ${
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
-                    <div className="flex items-center justify-between pb-6 border-b border-[var(--border)] mb-6 mt-1 flex-shrink-0">
-                        <span className="text-2xl font-extrabold text-gradient font-heading tracking-tight">
+                    <div className="flex items-center justify-between pb-6 border-b border-border mb-6 mt-1 flex-shrink-0">
+                        <span className="text-2xl font-extrabold text-foreground font-heading tracking-tight">
                             FounderOS
                         </span>
                         <button 
-                            className="text-zinc-500 hover:text-zinc-300 text-lg cursor-pointer ml-1"
+                            className="text-muted-foreground hover:text-foreground min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer -mr-2 transition-colors"
                             onClick={() => setIsOpen(false)}
+                            aria-label="Close Sidebar"
                         >
                             ✕
                         </button>
                     </div>
                     
-                    <nav className="flex flex-col gap-1.5 mb-6">
+                    <nav className="flex flex-col gap-1 mb-6">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.path;
                             return (
@@ -218,21 +223,21 @@ function Navbar(){
                     </nav>
                 </div>
 
-                <div className="pt-6 border-t border-[var(--border)] flex flex-col gap-4 flex-shrink-0 bg-transparent">
+                <div className="pt-6 border-t border-border flex flex-col gap-4 flex-shrink-0">
                     {user && (
                         <div className="flex items-center gap-3 px-2">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white via-zinc-200 to-zinc-400 flex items-center justify-center text-zinc-950 font-bold text-sm">
+                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
                                 {userInitials}
                             </div>
                             <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{user.name}</span>
-                                <span className="text-xs text-[var(--text-muted)] truncate">Founder</span>
+                                <span className="text-sm font-medium text-foreground truncate">{user.name}</span>
+                                <span className="text-xs text-muted-foreground truncate">Founder</span>
                             </div>
                         </div>
                     )}
                     
                     <button 
-                        className="nav-item w-full cursor-pointer" 
+                        className="nav-item justify-start w-full cursor-pointer mt-2" 
                         onClick={logout}
                     >
                         <span>Logout</span>

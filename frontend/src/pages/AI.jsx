@@ -39,18 +39,18 @@ function AI() {
         return lines.map((line, lineIndex) => {
             const trimmed = line.trim();
             if (trimmed.startsWith("### ")) {
-                return <h3 key={lineIndex} className="text-sm font-bold text-white mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
+                return <h3 key={lineIndex} className="text-sm font-bold text-foreground mt-4 mb-2 font-heading">{parseInline(trimmed.substring(4))}</h3>;
             }
             if (trimmed.startsWith("## ")) {
-                return <h2 key={lineIndex} className="text-base font-bold text-white mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
+                return <h2 key={lineIndex} className="text-base font-bold text-foreground mt-5 mb-2.5 font-heading">{parseInline(trimmed.substring(3))}</h2>;
             }
             if (trimmed.startsWith("# ")) {
-                return <h1 key={lineIndex} className="text-lg font-extrabold text-white mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
+                return <h1 key={lineIndex} className="text-lg font-extrabold text-foreground mt-6 mb-3 font-heading">{parseInline(trimmed.substring(2))}</h1>;
             }
             if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
                 return (
                     <ul key={lineIndex} className="list-disc pl-5 mb-1.5 space-y-1">
-                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(trimmed.substring(2))}</li>
+                        <li className="text-xs md:text-sm text-muted-foreground">{parseInline(trimmed.substring(2))}</li>
                     </ul>
                 );
             }
@@ -58,14 +58,14 @@ function AI() {
             if (matchNum) {
                 return (
                     <ol key={lineIndex} className="list-decimal pl-5 mb-1.5 space-y-1">
-                        <li className="text-xs md:text-sm text-zinc-300">{parseInline(matchNum[2])}</li>
+                        <li className="text-xs md:text-sm text-muted-foreground">{parseInline(matchNum[2])}</li>
                     </ol>
                 );
             }
             if (trimmed === "") {
                 return <div key={lineIndex} className="h-2"></div>;
             }
-            return <p key={lineIndex} className="text-xs md:text-sm text-zinc-300 leading-relaxed mb-2">{parseInline(line)}</p>;
+            return <p key={lineIndex} className="text-xs md:text-sm text-muted-foreground leading-relaxed mb-2">{parseInline(line)}</p>;
         });
     }
 
@@ -74,7 +74,7 @@ function AI() {
         const parts = text.split(/\*\*([^*]+)\*\*/g);
         return parts.map((part, index) => {
             if (index % 2 === 1) {
-                return <strong key={index} className="font-bold text-white html.light:text-zinc-950">{part}</strong>;
+                return <strong key={index} className="font-bold text-foreground html.light:text-zinc-950">{part}</strong>;
             }
             return part;
         });
@@ -191,7 +191,7 @@ function AI() {
     }, [messages, loadingChat, activeTab]);
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex h-screen overflow-hidden">
+        <div className="min-h-screen bg-background text-foreground flex h-screen overflow-hidden">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-6 flex flex-col h-full">
                 <header className="mb-6 flex-shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -199,7 +199,7 @@ function AI() {
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                             AI Workspace
                         </h1>
-                        <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
                             Co-founder chat, strategy SWOT matrices, meeting planners, and document writers.
                         </p>
                     </div>
@@ -211,7 +211,7 @@ function AI() {
                                 onChange={(e) => setSelectedStartupId(e.target.value)}
                             >
                                 {startups.map(s => (
-                                    <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                    <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -227,7 +227,7 @@ function AI() {
                             className={`py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                 activeTab === tab
                                     ? "bg-white text-zinc-950"
-                                    : "bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                                    : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                             }`}
                         >
                             {tab}
@@ -236,14 +236,14 @@ function AI() {
                 </div>
 
                 {/* Workspace Content Panels */}
-                <div className="flex-1 min-h-0 minimal-card p-4 md:p-6 flex flex-col rounded-2xl relative overflow-hidden border border-zinc-800 bg-zinc-950 mb-4">
+                <div className="flex-1 min-h-0 minimal-card p-4 md:p-6 flex flex-col rounded-2xl relative overflow-hidden border border-border bg-background mb-4">
                     {activeTab === "Chat" && (
                         <>
                             <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4">
                                 {messages.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-center p-8 max-w-md mx-auto">
-                                        <h3 className="text-lg font-bold text-white font-heading mb-2">Start a conversation</h3>
-                                        <p className="text-sm text-zinc-400 font-medium">
+                                        <h3 className="text-lg font-bold text-foreground font-heading mb-2">Start a conversation</h3>
+                                        <p className="text-sm text-muted-foreground font-medium">
                                             Ask me about your startup ideas, strategy moves, marketing plans, or metrics analysis.
                                         </p>
                                     </div>
@@ -257,7 +257,7 @@ function AI() {
                                                 className={`max-w-[80%] rounded-2xl px-4 py-3 transition-all duration-200 ${
                                                     msg.role === "user"
                                                         ? "bg-white text-zinc-950 font-medium rounded-br-none"
-                                                        : "bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-bl-none"
+                                                        : "bg-muted border border-border text-foreground rounded-bl-none"
                                                 }`}
                                             >
                                                 <div className="leading-relaxed">{renderMarkdown(msg.content)}</div>
@@ -268,7 +268,7 @@ function AI() {
 
                                 {loadingChat && (
                                     <div className="flex justify-start">
-                                        <div className="bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-2xl rounded-bl-none px-5 py-3.5 flex items-center space-x-1.5 shadow-md">
+                                        <div className="bg-muted border border-border text-muted-foreground rounded-2xl rounded-bl-none px-5 py-3.5 flex items-center space-x-1.5 shadow-md">
                                             <span className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                             <span className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
                                             <span className="w-2 h-2 bg-zinc-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
@@ -282,7 +282,7 @@ function AI() {
                                 <input
                                     type="text"
                                     placeholder="Ask your AI co-founder..."
-                                    className="flex-1 minimal-input py-3 px-4 rounded-xl text-zinc-100 placeholder-zinc-500"
+                                    className="flex-1 minimal-input py-3 px-4 rounded-xl text-foreground placeholder-zinc-500"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     disabled={loadingChat}
@@ -301,7 +301,7 @@ function AI() {
                     {activeTab === "Strategy & SWOT" && (
                         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
                             <div className="flex justify-between items-center gap-4 flex-shrink-0">
-                                <h3 className="font-bold text-zinc-200 text-sm">Venture Strategy SWOT Report</h3>
+                                <h3 className="font-bold text-foreground text-sm">Venture Strategy SWOT Report</h3>
                                 <button
                                     className="btn-primary py-2 px-4 text-xs"
                                     onClick={generateSWOT}
@@ -310,16 +310,16 @@ function AI() {
                                     {loadingSwot ? "Generating SWOT..." : "Generate SWOT"}
                                 </button>
                             </div>
-                            <div className="flex-1 overflow-y-auto bg-zinc-900/40 border border-zinc-900 p-4 rounded-xl">
+                            <div className="flex-1 overflow-y-auto bg-muted border border-zinc-900 p-4 rounded-xl">
                                 {loadingSwot ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-zinc-500 py-12">
-                                        <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-3"></div>
+                                    <div className="h-full flex flex-col items-center justify-center text-muted-foreground py-12">
+                                        <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-3"></div>
                                         <p className="animate-pulse text-xs">Assembling SWOT matrices...</p>
                                     </div>
                                 ) : swotReport ? (
                                     <div className="leading-relaxed">{renderMarkdown(swotReport)}</div>
                                 ) : (
-                                    <p className="text-zinc-500 text-xs text-center py-12">Click Generate SWOT to compile strategic venture analysis.</p>
+                                    <p className="text-muted-foreground text-xs text-center py-12">Click Generate SWOT to compile strategic venture analysis.</p>
                                 )}
                             </div>
                         </div>
@@ -328,7 +328,7 @@ function AI() {
                     {activeTab === "Meetings" && (
                         <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
                             <div className="flex-1 flex flex-col gap-3 min-w-0">
-                                <span className="font-bold text-zinc-200 text-sm">Raw Meeting Notes</span>
+                                <span className="font-bold text-foreground text-sm">Raw Meeting Notes</span>
                                 <textarea
                                     className="flex-1 minimal-input resize-none p-4 text-sm leading-relaxed"
                                     placeholder="Paste notes, raw summaries, or chat logs here..."
@@ -345,17 +345,17 @@ function AI() {
                                 </button>
                             </div>
                             <div className="flex-1 flex flex-col gap-3 min-w-0">
-                                <span className="font-bold text-zinc-200 text-sm">Parsed Action Items</span>
-                                <div className="flex-1 overflow-y-auto bg-zinc-900/40 border border-zinc-900 p-4 rounded-xl">
+                                <span className="font-bold text-foreground text-sm">Parsed Action Items</span>
+                                <div className="flex-1 overflow-y-auto bg-muted border border-zinc-900 p-4 rounded-xl">
                                     {loadingMeetings ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-zinc-500 py-12">
-                                            <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-3"></div>
+                                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground py-12">
+                                            <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-3"></div>
                                             <p className="animate-pulse text-xs">Parsing transcripts...</p>
                                         </div>
                                     ) : meetingReport ? (
                                         <div className="leading-relaxed">{renderMarkdown(meetingReport)}</div>
                                     ) : (
-                                        <p className="text-zinc-500 text-xs text-center py-12">Action items, decisions, and deadlines will render here.</p>
+                                        <p className="text-muted-foreground text-xs text-center py-12">Action items, decisions, and deadlines will render here.</p>
                                     )}
                                 </div>
                             </div>
@@ -365,17 +365,17 @@ function AI() {
                     {activeTab === "Doc Writer" && (
                         <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
                             <div className="w-full lg:w-1/3 flex flex-col gap-4 flex-shrink-0">
-                                <span className="font-bold text-zinc-200 text-sm">Document Target</span>
+                                <span className="font-bold text-foreground text-sm">Document Target</span>
                                 <select 
                                     className="minimal-input cursor-pointer text-sm"
                                     value={docType}
                                     onChange={(e) => setDocType(e.target.value)}
                                     disabled={loadingWriter}
                                 >
-                                    <option value="PRD" className="bg-zinc-950 text-zinc-100">Product Requirement Document (PRD)</option>
-                                    <option value="Pitch" className="bg-zinc-950 text-zinc-100">Pitch Deck Outline</option>
-                                    <option value="Vision" className="bg-zinc-950 text-zinc-100">Venture Vision statement</option>
-                                    <option value="Canvas" className="bg-zinc-950 text-zinc-100">Business Model Canvas (BMC)</option>
+                                    <option value="PRD" className="bg-background text-foreground">Product Requirement Document (PRD)</option>
+                                    <option value="Pitch" className="bg-background text-foreground">Pitch Deck Outline</option>
+                                    <option value="Vision" className="bg-background text-foreground">Venture Vision statement</option>
+                                    <option value="Canvas" className="bg-background text-foreground">Business Model Canvas (BMC)</option>
                                 </select>
                                 <button
                                     className="btn-primary py-3 font-bold text-sm w-full mt-2"
@@ -395,17 +395,17 @@ function AI() {
                                 )}
                             </div>
                             <div className="flex-1 flex flex-col gap-3 min-w-0">
-                                <span className="font-bold text-zinc-200 text-sm">Draft Preview</span>
-                                <div className="flex-1 overflow-y-auto bg-zinc-900/40 border border-zinc-900 p-4 rounded-xl">
+                                <span className="font-bold text-foreground text-sm">Draft Preview</span>
+                                <div className="flex-1 overflow-y-auto bg-muted border border-zinc-900 p-4 rounded-xl">
                                     {loadingWriter ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-zinc-500 py-12">
-                                            <div className="w-8 h-8 border-4 border-t-white border-zinc-800 rounded-full animate-spin mb-3"></div>
+                                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground py-12">
+                                            <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-3"></div>
                                             <p className="animate-pulse text-xs">Writing document blueprint...</p>
                                         </div>
                                     ) : draftedContent ? (
                                         <div className="leading-relaxed">{renderMarkdown(draftedContent)}</div>
                                     ) : (
-                                        <p className="text-zinc-500 text-xs text-center py-12">Drafted document preview will load here.</p>
+                                        <p className="text-muted-foreground text-xs text-center py-12">Drafted document preview will load here.</p>
                                     )}
                                 </div>
                             </div>

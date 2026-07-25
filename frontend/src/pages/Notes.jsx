@@ -128,7 +128,7 @@ function Notes() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -136,7 +136,7 @@ function Notes() {
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                             Notes
                         </h1>
-                        <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
                             Organize ideas, capture decisions, and leverage AI summaries.
                         </p>
                     </div>
@@ -147,7 +147,7 @@ function Notes() {
                             onChange={(e) => setSelectedStartupId(e.target.value)}
                         >
                             {startups.map(s => (
-                                <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                             ))}
                         </select>
                         <button 
@@ -162,9 +162,9 @@ function Notes() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Notes List Panel */}
                     <section className="minimal-card p-6 md:p-8 h-fit flex flex-col gap-4">
-                        <h2 className="text-lg font-bold text-white font-heading">Saved Notes</h2>
+                        <h2 className="text-lg font-bold text-foreground font-heading">Saved Notes</h2>
                         {notes.length === 0 ? (
-                            <p className="text-zinc-500 text-xs text-center py-6">No notes created yet.</p>
+                            <p className="text-muted-foreground text-xs text-center py-6">No notes created yet.</p>
                         ) : (
                             <div className="flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto pr-1">
                                 {notes.map(note => (
@@ -173,25 +173,25 @@ function Notes() {
                                         onClick={() => selectNote(note)}
                                         className={`p-3 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col gap-1.5 ${
                                             activeNote && activeNote.id === note.id 
-                                                ? "bg-zinc-900 border-zinc-700" 
-                                                : "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700"
+                                                ? "bg-muted border-border" 
+                                                : "bg-muted border-border hover:border-border"
                                         }`}
                                     >
                                         <div className="flex justify-between items-center gap-2">
-                                            <span className="font-bold text-sm text-zinc-200 truncate">{note.title}</span>
+                                            <span className="font-bold text-sm text-foreground truncate">{note.title}</span>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); togglePin(note.id); }}
                                                 className={`text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer ${
                                                     note.is_pinned 
                                                         ? "bg-white text-zinc-950" 
-                                                        : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+                                                        : "bg-secondary text-muted-foreground hover:text-foreground"
                                                 }`}
                                             >
                                                 {note.is_pinned ? "Pinned" : "Pin"}
                                             </button>
                                         </div>
                                         {note.tags && (
-                                            <span className="text-[10px] text-zinc-500 font-semibold truncate">{note.tags}</span>
+                                            <span className="text-[10px] text-muted-foreground font-semibold truncate">{note.tags}</span>
                                         )}
                                     </div>
                                 ))}
@@ -203,7 +203,7 @@ function Notes() {
                     <section className="lg:col-span-2">
                         {activeNote ? (
                             <div className="minimal-card p-6 md:p-8 flex flex-col gap-5">
-                                <h2 className="text-lg font-bold text-white font-heading">
+                                <h2 className="text-lg font-bold text-foreground font-heading">
                                     {activeNote.id === "new" ? "Create Note" : "Edit Note"}
                                 </h2>
                                 <div className="flex flex-col gap-4">

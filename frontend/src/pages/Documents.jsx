@@ -62,7 +62,7 @@ function Documents() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -70,7 +70,7 @@ function Documents() {
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
                             Venture Documents
                         </h1>
-                        <p className="text-zinc-400 text-sm md:text-base font-medium">
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
                             Draft and maintain product blueprints, strategy guides, and pitches.
                         </p>
                     </div>
@@ -81,7 +81,7 @@ function Documents() {
                             onChange={(e) => setSelectedStartupId(e.target.value)}
                         >
                             {startups.map(s => (
-                                <option key={s.id} value={s.id} className="bg-zinc-950 text-zinc-100">{s.name}</option>
+                                <option key={s.id} value={s.id} className="bg-background text-foreground">{s.name}</option>
                             ))}
                         </select>
                     </div>
@@ -96,7 +96,7 @@ function Documents() {
                             className={`py-2 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                 activeTab === tab.id
                                     ? "bg-white text-zinc-950"
-                                    : "bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                                    : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                             }`}
                         >
                             {tab.label}
@@ -106,7 +106,7 @@ function Documents() {
 
                 <div className="minimal-card p-6 md:p-8 flex flex-col gap-6">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-lg font-bold text-white font-heading">
+                        <h2 className="text-lg font-bold text-foreground font-heading">
                             {tabs.find(t => t.id === activeTab)?.label}
                         </h2>
                         <button 

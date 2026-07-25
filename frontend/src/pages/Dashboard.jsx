@@ -63,141 +63,139 @@ function Dashboard() {
     const taskProgress = stats.total_tasks > 0 ? Math.round((stats.completed_tasks / stats.total_tasks) * 100) : 0;
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex">
+        <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
-            <main className="flex-1 min-w-0 pt-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
-                <header className="mb-12">
+            <main className="flex-1 min-w-0 pt-24 px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
+                <header className="mb-10">
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Hey <span className="text-gradient">{userName || "Founder"}</span>
+                        Hey <span>{userName || "Founder"}</span>
                     </h1>
-                    <p className="text-zinc-400 text-sm md:text-base font-medium">
+                    <p className="text-muted-foreground text-sm md:text-base font-medium">
                         Here's your venture command center. Track progress, manage goals, and execute milestones.
                     </p>
                 </header>
 
                 {error && (
-                    <div className="minimal-card p-6 md:p-8 border border-red-900/40 bg-red-950/5 text-center flex flex-col items-center justify-center gap-3 mb-8 flex-shrink-0">
-                        <span className="text-2xl">⚠️</span>
-                        <p className="text-sm font-semibold text-red-400 max-w-md">{error}</p>
+                    <div className="minimal-card p-6 flex flex-col items-center justify-center gap-3 mb-8 border-destructive bg-destructive/10 text-center">
+                        <span className="text-2xl" aria-hidden="true">⚠️</span>
+                        <p className="text-sm font-semibold text-destructive max-w-md">{error}</p>
                         <button 
                             onClick={loadStats}
-                            className="mt-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                            className="mt-2 btn-secondary text-xs"
                         >
                             Retry connection
                         </button>
                     </div>
                 )}
 
-                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
+                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <Card title="Total Startups" value={stats.total_startups} subtext="Active companies" />
                     <Card title="Goals Completed" value={`${stats.completed_goals}/${stats.total_goals}`} subtext="Strategic milestones" />
                     <Card title="Tasks Completed" value={`${stats.completed_tasks}/${stats.total_tasks}`} subtext="Actionable tasks" />
                     <Card title="Overall Progress" value={`${Math.round((goalProgress + taskProgress) / 2)}%`} subtext="Venture velocity" />
                 </section>
 
-                <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
-                    <div className="minimal-card p-6 md:p-8 flex flex-col gap-4">
-                        <h2 className="text-lg font-bold text-white font-heading">Daily Focus</h2>
-                        <div className="flex flex-col gap-3">
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="minimal-card p-6 flex flex-col gap-4">
+                        <h2 className="text-lg font-bold text-foreground font-heading">Daily Focus</h2>
+                        <div className="flex flex-col gap-4">
                             {stats.pending_goals_list && stats.pending_goals_list.length > 0 ? (
                                 stats.pending_goals_list.map(goal => (
-                                    <div key={goal.id} className="p-3.5 bg-zinc-900/60 rounded-xl border border-zinc-800 text-xs">
-                                        <p className="font-bold text-zinc-200 mb-1">{goal.title}</p>
-                                        <span className="text-[10px] text-zinc-500 font-semibold">{goal.startup_name}</span>
+                                    <div key={goal.id} className="p-4 bg-muted rounded-lg border border-border text-sm">
+                                        <p className="font-semibold text-foreground mb-1">{goal.title}</p>
+                                        <span className="text-xs text-muted-foreground">{goal.startup_name}</span>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-zinc-500 text-xs py-4 text-center">No active goals. Set one to start your focus!</p>
+                                <p className="text-muted-foreground text-sm py-4 text-center">No active goals. Set one to start your focus!</p>
                             )}
                         </div>
                     </div>
                     
-                    <div className="minimal-card p-6 md:p-8 flex flex-col gap-4">
-                        <h2 className="text-lg font-bold text-white font-heading">Upcoming Milestones</h2>
-                        <div className="flex flex-col gap-3">
+                    <div className="minimal-card p-6 flex flex-col gap-4">
+                        <h2 className="text-lg font-bold text-foreground font-heading">Upcoming Milestones</h2>
+                        <div className="flex flex-col gap-4">
                             {stats.events_list && stats.events_list.length > 0 ? (
                                 stats.events_list.map(event => (
-                                    <div key={event.id} className="p-3.5 bg-zinc-900/60 rounded-xl border border-zinc-800 text-xs flex justify-between items-center gap-3">
+                                    <div key={event.id} className="p-4 bg-muted rounded-lg border border-border text-sm flex justify-between items-center gap-3">
                                         <div className="min-w-0">
-                                            <p className="font-bold text-zinc-200 truncate mb-1">{event.title}</p>
-                                            <span className="text-[10px] text-zinc-500 font-semibold">{event.startup_name}</span>
+                                            <p className="font-semibold text-foreground truncate mb-1">{event.title}</p>
+                                            <span className="text-xs text-muted-foreground">{event.startup_name}</span>
                                         </div>
-                                        <span className="text-[10px] text-white bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded whitespace-nowrap font-bold">
+                                        <span className="text-xs text-secondary-foreground bg-secondary border border-border px-2.5 py-1 rounded font-semibold whitespace-nowrap">
                                             {event.date}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-zinc-500 text-xs py-4 text-center">No upcoming dates scheduled.</p>
+                                <p className="text-muted-foreground text-sm py-4 text-center">No upcoming dates scheduled.</p>
                             )}
                         </div>
                     </div>
                 </section>
 
-                <section className="minimal-card p-6 md:p-8 mb-10">
-                    <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-8">Completion Status</h2>
+                <section className="minimal-card p-6 mb-8">
+                    <h2 className="text-lg md:text-xl font-bold text-foreground font-heading mb-6">Completion Status</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <p className="text-sm font-semibold text-zinc-300 mb-2">Goals Progress</p>
-                            <ProgressBar percentage={goalProgress} showPercent={true} />
+                            <ProgressBar percentage={goalProgress} showPercent={true} label="Goals Progress" />
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-zinc-300 mb-2">Tasks Progress</p>
-                            <ProgressBar percentage={taskProgress} showPercent={true} />
+                            <ProgressBar percentage={taskProgress} showPercent={true} label="Tasks Progress" />
                         </div>
                     </div>
                 </section>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                    <section className="minimal-card p-6 md:p-8">
-                        <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <section className="minimal-card p-6">
+                        <h2 className="text-lg md:text-xl font-bold text-foreground font-heading mb-6 flex items-center gap-2">
                             Recent Activity
                         </h2>
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-4">
                             {stats.recent_stuff && stats.recent_stuff.length > 0 ? (
                                 stats.recent_stuff.slice(0, 5).map((activity) => (
-                                    <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
+                                    <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-4 bg-muted hover:bg-muted/80 rounded-lg border border-border transition-colors">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-sm font-semibold text-zinc-200 truncate">{activity.title}</span>
-                                                <span className="text-xs text-zinc-500">
+                                                <span className="text-sm font-semibold text-foreground truncate">{activity.title}</span>
+                                                <span className="text-xs text-muted-foreground mt-0.5">
                                                     {activity.type === "goal" ? "Goal" : "Task"}
                                                 </span>
                                             </div>
                                         </div>
-                                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border whitespace-nowrap ml-2 ${
+                                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border whitespace-nowrap ml-3 ${
                                             activity.status === "Completed" 
-                                                ? "bg-white text-zinc-950 font-bold border-white" 
-                                                : "bg-zinc-900 text-zinc-400 border-zinc-800"
+                                                ? "bg-primary text-primary-foreground border-primary" 
+                                                : "bg-secondary text-secondary-foreground border-transparent"
                                         }`}>
                                             {activity.status === "Completed" ? "Done" : "Pending"}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                                <div className="flex flex-col items-center justify-center text-center p-8 bg-muted/50 rounded-xl border border-border text-muted-foreground text-sm">
                                     No recent activity. Start creating goals!
                                 </div>
                             )}
                         </div>
                     </section>
 
-                    <section className="minimal-card p-6 md:p-8">
-                        <h2 className="text-lg md:text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
+                    <section className="minimal-card p-6">
+                        <h2 className="text-lg md:text-xl font-bold text-foreground font-heading mb-6 flex items-center gap-2">
                             Pending Tasks
                         </h2>
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-4">
                             {stats.todos && stats.todos.length > 0 ? (
                                 stats.todos.slice(0, 5).map((task) => (
-                                    <div key={task.id} className="flex items-center justify-between p-3.5 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl border border-zinc-800 transition-all duration-200">
+                                    <div key={task.id} className="flex items-center justify-between p-4 bg-muted hover:bg-muted/80 rounded-lg border border-border transition-colors">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-sm font-semibold text-zinc-200 truncate">{task.title}</span>
-                                                <span className="text-xs text-zinc-500">Milestone pending</span>
+                                                <span className="text-sm font-semibold text-foreground truncate">{task.title}</span>
+                                                <span className="text-xs text-muted-foreground mt-0.5">Milestone pending</span>
                                             </div>
                                         </div>
                                         <button 
-                                            className="px-3.5 py-1.5 text-xs font-bold text-zinc-950 bg-white hover:bg-zinc-200 rounded-lg transition-all duration-200 whitespace-nowrap ml-2 cursor-pointer"
+                                            className="btn-secondary text-xs ml-3 h-8 px-3"
                                             onClick={() => finishTask(task.id)}
                                         >
                                             Complete
@@ -205,7 +203,7 @@ function Dashboard() {
                                     </div>
                                 ))
                             ) : (
-                                <div className="flex flex-col items-center justify-center text-center p-8 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800 text-zinc-500 text-sm">
+                                <div className="flex flex-col items-center justify-center text-center p-8 bg-muted/50 rounded-xl border border-border text-muted-foreground text-sm">
                                     All tasks completed.
                                 </div>
                             )}

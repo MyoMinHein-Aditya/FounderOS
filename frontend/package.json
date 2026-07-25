@@ -12,12 +12,20 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",
     "axios": "^1.17.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.26.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.17.0",
-    "tailwindcss": "^4.3.1"
+    "reactflow": "^11.11.4",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.1",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@babel/parser": "^8.0.4",
+    "@babel/traverse": "^8.0.4",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

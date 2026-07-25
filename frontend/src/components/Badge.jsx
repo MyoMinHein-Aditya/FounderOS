@@ -1,15 +1,15 @@
 function Badge({ status, label, icon }) {
     const badgeStyles = {
-        completed: "bg-zinc-900 text-zinc-200 border-zinc-700",
-        pending: "bg-zinc-900/80 text-zinc-400 border-zinc-800",
-        active: "bg-white text-zinc-950 font-bold border-white",
-        default: "bg-zinc-900 text-zinc-300 border-zinc-800"
+        completed: "bg-primary/10 text-primary border-primary/20",
+        pending: "bg-muted text-muted-foreground border-border",
+        active: "bg-primary text-primary-foreground border-primary",
+        default: "bg-secondary text-secondary-foreground border-transparent"
     };
 
     const style = badgeStyles[status] || badgeStyles.default;
 
     return (
-        <span className={`badge ${style}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${style}`}>
             {icon && <span>{icon}</span>}
             <span>{label}</span>
         </span>
