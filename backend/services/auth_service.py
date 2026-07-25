@@ -1,16 +1,16 @@
-from sqlalchemy.orm import Session
-from models.users import User
+from repositories.user import UserRepository
 from schemas.user import UserCreate, UserLogin
 from utils.security import hash_password, verify_password
 from utils.jwt_handler import create_access_token
 from fastapi import HTTPException
+from models.users import User
 
 class AuthService:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, repo: UserRepository):
+        self.repo = repo
 
     def register(self, data: UserCreate) -> User:
-        existing_user = self.db.query(User).filter(User.email == data.email).first()
+        existing_user = self.repo.get_by_email(data.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Email Already Registered")
         
@@ -19,13 +19,10 @@ class AuthService:
             email=data.email,
             password=hash_password(data.password)
         )
-        self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-        return user
+        return self.repo.create(user)
 
     def login(self, data: UserLogin) -> dict:
-        db_user = self.db.query(User).filter(User.email == data.email).first()
+        db_user = self.repo.get_by_email(data.email)
         if not db_user or not verify_password(data.password, db_user.password):
             raise HTTPException(status_code=401, detail="Invalid Credentials")
         
@@ -33,7 +30,7 @@ class AuthService:
         return {"access_token": token, "token_type": "bearer"}
 
     def get_user_by_id(self, user_id: int) -> User:
-        user = self.db.query(User).filter(User.id == user_id).first()
+        user = self.repo.get_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user

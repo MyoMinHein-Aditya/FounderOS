@@ -5,9 +5,11 @@ from models.goal import Goal
 from schemas.task import TaskCreate
 from fastapi import HTTPException
 from agents.task_agent import task_agent
+from repositories.task import TaskRepository
 
 class TaskService:
-    def __init__(self, db: Session):
+    def __init__(self, repo: TaskRepository, db: Session):
+        self.repo = repo
         self.db = db
 
     def create(self, data: TaskCreate, owner_id: int) -> Task:
@@ -25,10 +27,7 @@ class TaskService:
             goal_id=data.goal_id,
             status="Pending"
         )
-        self.db.add(task)
-        self.db.commit()
-        self.db.refresh(task)
-        return task
+        return self.repo.create(task)
 
     def get_tasks_by_startup(self, startup_id: int, owner_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10) -> list:
         startup = self.db.query(Startup).filter(Startup.id == startup_id, Startup.owner_id == owner_id).first()

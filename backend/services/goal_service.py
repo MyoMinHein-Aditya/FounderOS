@@ -3,9 +3,11 @@ from models.goal import Goal
 from models.startup import Startup
 from schemas.goal import GoalCreate
 from fastapi import HTTPException
+from repositories.goal import GoalRepository
 
 class GoalService:
-    def __init__(self, db: Session):
+    def __init__(self, repo: GoalRepository, db: Session):
+        self.repo = repo
         self.db = db
 
     def create(self, data: GoalCreate, owner_id: int) -> Goal:
@@ -18,10 +20,7 @@ class GoalService:
             description=data.description,
             startup_id=data.startup_id
         )
-        self.db.add(goal)
-        self.db.commit()
-        self.db.refresh(goal)
-        return goal
+        return self.repo.create(goal)
 
     def get_all_by_owner(self, owner_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10) -> list:
         query = self.db.query(Goal).join(Startup).filter(Startup.owner_id == owner_id)

@@ -18,20 +18,21 @@ import models.team
 import models.team_member
 import models.comment
 import models.crm
-from routes.auth import router as auth_router
-from routes.startup import router as startup_router
-from routes.goal import router as goal_router
-from routes.task import router as task_router
-from routes.dashboard import router as dashboard_router
-from routes.ai import router as agent_router
-from routes.notes import router as notes_router
-from routes.documents import router as documents_router
-from routes.notifications import router as notifications_router
-from routes.calendar import router as calendar_router
+
+from controllers.auth import router as auth_router
+from controllers.startup import router as startup_router
+from controllers.goal import router as goal_router
+from controllers.task import router as task_router
+from controllers.dashboard import router as dashboard_router
+from controllers.ai import router as agent_router
+from controllers.notes import router as notes_router
+from controllers.documents import router as documents_router
+from controllers.notifications import router as notifications_router
+from controllers.calendar import router as calendar_router
 from routes.ws import router as ws_router
-from routes.collaboration import router as collaboration_router
-from routes.ai_features import router as ai_features_router
-from routes.crm import router as crm_router
+from controllers.collaboration import router as collaboration_router
+from controllers.ai_features import router as ai_features_router
+from controllers.crm import router as crm_router
 from middleware.rate_limit import rate_limit_middleware
 
 app = FastAPI(dependencies=[Depends(rate_limit_middleware)])
@@ -46,7 +47,6 @@ async def brain_trace_middleware(request: Request, call_next):
     if trace_id and os.getenv("ENVIRONMENT", "dev") == "dev":
         duration = (time.time() - start_time) * 1000
         try:
-            # Clean up the path for matching (e.g. remove /api prefix if present, but we just use route.path)
             target = request.url.path
             requests.post(
                 "http://localhost:5173/__brain_webhook",
@@ -88,19 +88,19 @@ def db_test():
     finally:
         db.close()
 
-app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
-app.include_router(startup_router, prefix="/startup", tags=["Startup"])
-app.include_router(goal_router, prefix="/goal", tags=["Goals"])
-app.include_router(task_router, prefix="/task", tags=["Tasks"])
-app.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
-app.include_router(agent_router, prefix="/chat", tags=["AI"])
-app.include_router(notes_router, prefix="/notes", tags=["Notes"])
-app.include_router(documents_router, prefix="/documents", tags=["Documents"])
-app.include_router(notifications_router, prefix="/notifications", tags=["Notifications"])
-app.include_router(calendar_router, prefix="/calendar", tags=["Calendar"])
+app.include_router(auth_router, tags=["Authentication"])
+app.include_router(startup_router, tags=["Startup"])
+app.include_router(goal_router, tags=["Goals"])
+app.include_router(task_router, tags=["Tasks"])
+app.include_router(dashboard_router, tags=["Dashboard"])
+app.include_router(agent_router, tags=["AI"])
+app.include_router(notes_router, tags=["Notes"])
+app.include_router(documents_router, tags=["Documents"])
+app.include_router(notifications_router, tags=["Notifications"])
+app.include_router(calendar_router, tags=["Calendar"])
 app.include_router(ws_router, tags=["WebSockets"])
-app.include_router(collaboration_router, prefix="/collaboration", tags=["Collaboration"])
-app.include_router(ai_features_router, prefix="/ai-features", tags=["AI Workspace"])
-app.include_router(crm_router, prefix="/crm", tags=["CRM"])
+app.include_router(collaboration_router, tags=["Collaboration"])
+app.include_router(ai_features_router, tags=["AI Workspace"])
+app.include_router(crm_router, tags=["CRM"])
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])

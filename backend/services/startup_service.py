@@ -3,9 +3,11 @@ from models.startup import Startup
 from models.goal import Goal
 from models.task import Task
 from schemas.startup import StartupCreate
+from repositories.startup import StartupRepository
 
 class StartupService:
-    def __init__(self, db: Session):
+    def __init__(self, repo: StartupRepository, db: Session):
+        self.repo = repo
         self.db = db
 
     def create(self, data: StartupCreate, owner_id: int) -> Startup:
@@ -16,12 +18,11 @@ class StartupService:
             industry=data.industry,
             owner_id=owner_id
         )
-        self.db.add(startup)
-        self.db.commit()
-        self.db.refresh(startup)
-        return startup
+        return self.repo.create(startup)
 
     def get_all_by_owner(self, owner_id: int, search: str = None, page: int = 1, limit: int = 10) -> list:
+        # We can still use repo for this if we added search/pagination to repo, 
+        # but for complex queries we can fallback to db or custom repo methods.
         query = self.db.query(Startup).filter(Startup.owner_id == owner_id)
         if search:
             query = query.filter(Startup.name.ilike(f"%{search}%") | Startup.industry.ilike(f"%{search}%"))
@@ -29,7 +30,10 @@ class StartupService:
         return [self._format_startup(s) for s in startups]
 
     def get_by_id(self, startup_id: int, owner_id: int) -> Startup:
-        return self.db.query(Startup).filter(Startup.id == startup_id, Startup.owner_id == owner_id).first()
+        startup = self.repo.get_by_id(startup_id)
+        if startup and startup.owner_id == owner_id:
+            return startup
+        return None
 
     def compile_data(self, startup_id: int, owner_id: int) -> dict:
         startup = self.get_by_id(startup_id, owner_id)
