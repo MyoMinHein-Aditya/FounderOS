@@ -65,7 +65,7 @@ async def brain_trace_middleware(request: Request, call_next):
             
     return response
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def home():
