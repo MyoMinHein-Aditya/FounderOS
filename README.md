@@ -108,24 +108,8 @@ FounderOS includes several specialized, autonomous AI agents to guide your start
 
 ---
 
-## 🌐 Deployment Guide
-
-### 1. Database Setup (Supabase)
-FounderOS uses PostgreSQL as its database. You can host this easily on [Supabase](https://supabase.com/):
-1. Sign up for a free Supabase account and create a new project.
-2. Once the project is provisioned, go to **Project Settings** > **Database** > **Connection string** > **URI**.
-3. Copy the URI connection string. It will look like this:
-   `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres`
-4. Replace `[YOUR-PASSWORD]` with the database password you chose during setup.
-5. In your production backend deployment environment, set this connection string as the value of the `DATABASE_URL` environment variable.
-6. Optional: You can paste the contents of [schema.sql](file:///d:/Projects/FounderOS/backend/database/schema.sql) directly into the Supabase SQL Editor and run it to pre-configure all database tables. (Otherwise, SQLAlchemy's ORM will automatically create the tables on the first backend API call).
-
-### 2. Frontend Deployment (Vercel)
-You can deploy the React Vite frontend directly to [Vercel](https://vercel.com/):
-1. Create a free Vercel account and connect your GitHub repository.
-2. Click **Add New** > **Project** and import the `FounderOS` repository.
-3. In the project configuration:
-   - Set the **Root Directory** to `frontend`.
-   - Ensure the framework preset is set to **Vite** (build command: `npm run build`, output directory: `dist`).
-4. Click **Deploy**. Vercel will build and host your frontend.
-5. Vercel will automatically detect and apply the [vercel.json](file:///d:/Projects/FounderOS/frontend/vercel.json) configuration to route all client-side page requests (like `/dashboard`, `/ai`) to `/index.html` preventing 404 errors.
+## Live Demo Guide
+Click the link down below:-
+1. https://founder-os-frontend-kappa.vercel.app
+2. Sign Up
+3. Manage
