@@ -17,7 +17,8 @@ class AuthService:
         user = User(
             name=data.name,
             email=data.email,
-            password=hash_password(data.password)
+            password=hash_password(data.password),
+            role=data.role
         )
         return self.repo.create(user)
 

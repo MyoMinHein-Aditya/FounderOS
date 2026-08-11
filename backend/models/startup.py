@@ -1,7 +1,9 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
+from sqlalchemy import JSON
 
 from database.base import Base
 
@@ -19,3 +21,7 @@ class Startup(Base):
     industry = Column(String)
 
     owner_id = Column(Integer,ForeignKey("users.id"))
+    
+    revenue = Column(Float, default=0.0)
+    
+    stats = Column(JSON, nullable=True)

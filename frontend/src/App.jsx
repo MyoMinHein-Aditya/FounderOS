@@ -25,6 +25,7 @@ import Kanban from "./pages/Kanban";
 import Financials from "./pages/Financials";
 import CRM from "./pages/CRM";
 import Whiteboard from "./pages/Whiteboard";
+import Investor from "./pages/Investor";
 
 const BrainOverlay = import.meta.env.DEV ? lazy(() => import("../devtools/brain/BrainOverlay")) : () => null;
 
@@ -86,6 +87,7 @@ function App(){
             <Route path="/financials" element={<AuthCheck><Financials/></AuthCheck>}/>
             <Route path="/crm" element={<AuthCheck><CRM/></AuthCheck>}/>
             <Route path="/whiteboard" element={<AuthCheck><Whiteboard/></AuthCheck>}/>
+            <Route path="/investor" element={<AuthCheck><Investor/></AuthCheck>}/>
           </Routes>
           <Suspense fallback={null}>
             {import.meta.env.DEV && <BrainOverlay />}

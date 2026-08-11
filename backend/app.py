@@ -33,6 +33,7 @@ from routes.ws import router as ws_router
 from controllers.collaboration import router as collaboration_router
 from controllers.ai_features import router as ai_features_router
 from controllers.crm import router as crm_router
+from controllers.investor import router as investor_router
 from middleware.rate_limit import rate_limit_middleware
 
 app = FastAPI(dependencies=[Depends(rate_limit_middleware)])
@@ -102,5 +103,6 @@ app.include_router(ws_router, tags=["WebSockets"])
 app.include_router(collaboration_router, tags=["Collaboration"])
 app.include_router(ai_features_router, tags=["AI Workspace"])
 app.include_router(crm_router, tags=["CRM"])
+app.include_router(investor_router, tags=["Investor"])
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])

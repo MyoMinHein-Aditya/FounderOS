@@ -7,12 +7,13 @@ function Register(){
     const[name,setName] = useState("");
     const[email,setEmail] = useState("");
     const[password,setPassword] = useState("");
+    const[role,setRole] = useState("founder");
     const [loading, setLoading] = useState(false);
 
     async function register(){
         try {
             setLoading(true);
-            await api.post("/auth/register",{name,email,password});
+            await api.post("/auth/register",{name,email,password,role});
             alert("Registration Successful. Please login.");
             window.location.href="/";
         } catch (err) {
@@ -36,6 +37,15 @@ function Register(){
                 </header>
 
                 <div className="flex flex-col gap-4">
+                    <select 
+                        className="minimal-input bg-background"
+                        value={role}
+                        onChange={(e)=>setRole(e.target.value)}
+                        disabled={loading}
+                    >
+                        <option value="founder">I am a Founder</option>
+                        <option value="investor">I am an Investor</option>
+                    </select>
                     <input 
                         className="minimal-input"
                         placeholder="Full Name" 
