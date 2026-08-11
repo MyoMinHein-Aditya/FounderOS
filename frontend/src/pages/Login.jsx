@@ -13,7 +13,14 @@ function Login(){
             setLoading(true);
             const res = await api.post("/auth/login",{email,password});
             localStorage.setItem("token",res.data.access_token);
-            window.location.href="/dashboard";
+            
+            // Fetch user profile to determine role
+            const userRes = await api.get("/auth/me");
+            if (userRes.data.role === "investor") {
+                window.location.href = "/investor";
+            } else {
+                window.location.href = "/dashboard";
+            }
         } catch (err) {
             alert(err.response?.data?.detail || "Login Failed");
             setLoading(false);
