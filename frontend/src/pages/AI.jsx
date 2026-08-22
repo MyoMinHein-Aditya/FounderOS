@@ -1,7 +1,17 @@
 import { useState, useEffect, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
+
+const chatSchema = z.object({
+    message: z.string().min(1, "Message cannot be empty")
+});
+
+const meetingSchema = z.object({
+    notes: z.string().min(1, "Please input raw meeting notes")
+});
 
 function AI() {
     const { showToast } = useToast();
@@ -10,27 +20,21 @@ function AI() {
     // Chat Tab States
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const [loadingChat, setLoadingChat] = useState(false);
     const messagesEndRef = useRef(null);
 
     // Common/Shared States
-    const [startups, setStartups] = useState([]);
     const [selectedStartupId, setSelectedStartupId] = useState("");
 
     // Strategy SWOT States
     const [swotReport, setSwotReport] = useState("");
-    const [loadingSwot, setLoadingSwot] = useState(false);
 
     // Meeting Extractor States
     const [rawNotes, setRawNotes] = useState("");
     const [meetingReport, setMeetingReport] = useState("");
-    const [loadingMeetings, setLoadingMeetings] = useState(false);
 
     // Doc Writer States
     const [docType, setDocType] = useState("PRD"); // PRD, Pitch, Vision, Canvas
     const [draftedContent, setDraftedContent] = useState("");
-    const [loadingWriter, setLoadingWriter] = useState(false);
-    const [isExporting, setIsExporting] = useState(false);
 
     // Helper to format raw markdown into beautiful React elements
     function renderMarkdown(text) {
@@ -80,109 +84,143 @@ function AI() {
         });
     }
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
+    });
 
-    // Chat Functions
-    async function loadHistory() {
-        try {
-            const res = await api.get("/chat/history");
-            setMessages(res.data);
-        } catch (err) {
-            console.error("Failed to load chat history:", err);
+    useEffect(() => {
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
         }
-    }
+    }, [startups, selectedStartupId]);
+
+    const { data: history = [] } = useQuery({
+        queryKey: ["chatHistory"],
+        queryFn: async () => {
+            const res = await api.get("/chat/history");
+            return res.data;
+        }
+    });
+
+    useEffect(() => {
+        if (history.length > 0 && messages.length === 0) {
+            setMessages(history);
+        }
+    }, [history]);
+
+    const chatMutation = useMutation({
+        mutationFn: async (msg) => {
+            const res = await api.post("/chat/chat", { message: msg });
+            return res.data.response;
+        },
+        onSuccess: (response) => {
+            setMessages(prev => [...prev, { role: "assistant", content: response }]);
+        },
+        onError: () => {
+            setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
+        }
+    });
+
+    const loadingChat = chatMutation.isPending;
 
     async function handleSend(e) {
         if (e) e.preventDefault();
-        if (!input.trim() || loadingChat) return;
-
         const currentInput = input;
+        
+        const result = chatSchema.safeParse({ message: currentInput });
+        if (!result.success || loadingChat) return;
+
         setMessages(prev => [...prev, { role: "user", content: currentInput }]);
         setInput("");
-        setLoadingChat(true);
-
-        try {
-            const res = await api.post("/chat/chat", { message: currentInput });
-            setMessages(prev => [...prev, { role: "assistant", content: res.data.response }]);
-        } catch (err) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error. Please try again." }]);
-        } finally {
-            setLoadingChat(false);
-        }
+        chatMutation.mutate(currentInput);
     }
 
-    // Strategy functions
+    const swotMutation = useMutation({
+        mutationFn: async () => {
+            const res = await api.post(`/ai-features/strategy/${selectedStartupId}`);
+            return res.data.analysis;
+        },
+        onSuccess: (analysis) => {
+            setSwotReport(analysis);
+            showToast("SWOT analysis generated", "success");
+        },
+        onError: () => {
+            showToast("Failed to generate SWOT", "error");
+        }
+    });
+
+    const loadingSwot = swotMutation.isPending;
+
     async function generateSWOT() {
         if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        setLoadingSwot(true);
-        try {
-            const res = await api.post(`/ai-features/strategy/${selectedStartupId}`);
-            setSwotReport(res.data.analysis);
-            showToast("SWOT analysis generated", "success");
-        } catch (err) {
-            showToast("Failed to generate SWOT", "error");
-        } finally {
-            setLoadingSwot(false);
-        }
+        swotMutation.mutate();
     }
 
-    // Meeting Minutes functions
-    async function extractMinutes() {
-        if (!rawNotes.trim()) return showToast("Please input raw meeting notes", "warning");
-        setLoadingMeetings(true);
-        try {
+    const extractMinutesMutation = useMutation({
+        mutationFn: async () => {
             const res = await api.post("/ai-features/meetings/extract", null, { params: { notes_text: rawNotes } });
-            setMeetingReport(res.data.analysis);
+            return res.data.analysis;
+        },
+        onSuccess: (analysis) => {
+            setMeetingReport(analysis);
             showToast("Meeting minutes extracted successfully", "success");
-        } catch (err) {
+        },
+        onError: () => {
             showToast("Failed to extract minutes", "error");
-        } finally {
-            setLoadingMeetings(false);
         }
+    });
+
+    const loadingMeetings = extractMinutesMutation.isPending;
+
+    async function extractMinutes() {
+        const result = meetingSchema.safeParse({ notes: rawNotes });
+        if (!result.success) return showToast(result.error.errors[0].message, "warning");
+        extractMinutesMutation.mutate();
     }
 
-    // Doc Writer functions
+    const writeDocMutation = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/ai-features/writer/generate", null, { params: { doc_type: docType, startup_id: Number(selectedStartupId) } });
+            return res.data.content;
+        },
+        onSuccess: (content) => {
+            setDraftedContent(content);
+            showToast("Document drafted successfully", "success");
+        },
+        onError: () => {
+            showToast("Failed to draft document", "error");
+        }
+    });
+
+    const loadingWriter = writeDocMutation.isPending;
+
     async function handleWriteDocument() {
         if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        setLoadingWriter(true);
-        try {
-            const res = await api.post("/ai-features/writer/generate", null, { params: { doc_type: docType, startup_id: Number(selectedStartupId) } });
-            setDraftedContent(res.data.content);
-            showToast("Document drafted successfully", "success");
-        } catch (err) {
-            showToast("Failed to draft document", "error");
-        } finally {
-            setLoadingWriter(false);
-        }
+        writeDocMutation.mutate();
     }
+
+    const exportDocMutation = useMutation({
+        mutationFn: async () => {
+            await api.post("/documents/save", { startup_id: Number(selectedStartupId), type: docType, content: draftedContent });
+        },
+        onSuccess: () => {
+            showToast(`Exported successfully to documents workspace!`, "success");
+        },
+        onError: () => {
+            showToast("Failed to export document", "error");
+        }
+    });
+
+    const isExporting = exportDocMutation.isPending;
 
     async function handleExportToDocs() {
         if (!selectedStartupId || !draftedContent.trim()) return;
-        setIsExporting(true);
-        try {
-            await api.post("/documents/save", { startup_id: Number(selectedStartupId), type: docType, content: draftedContent });
-            showToast(`Exported successfully to documents workspace!`, "success");
-        } catch (err) {
-            showToast("Failed to export document", "error");
-        } finally {
-            setIsExporting(false);
-        }
+        exportDocMutation.mutate();
     }
-
-    useEffect(() => {
-        loadStartups();
-        loadHistory();
-    }, []);
 
     useEffect(() => {
         if (activeTab === "Chat") {

@@ -1,24 +1,18 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../context/ThemeContext";
 
 function Settings(){
-    const [user, setUser] = useState(null);
     const { theme, setTheme } = useTheme();
 
-    async function loadUser(){
-        try {
+    const { data: user } = useQuery({
+        queryKey: ["user"],
+        queryFn: async () => {
             const res = await api.get("/auth/me");
-            setUser(res.data);
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
-
-    useEffect(() => {
-        loadUser();
-    }, []);
+    });
 
     function changeTheme(newTheme) {
         setTheme(newTheme);

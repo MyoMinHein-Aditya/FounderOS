@@ -1,78 +1,101 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const commentSchema = z.object({
+    content: z.string().min(1, "Comment cannot be empty")
+});
+
 function Kanban() {
     const { showToast } = useToast();
-    const [startups, setStartups] = useState([]);
+    const queryClient = useQueryClient();
     const [selectedStartupId, setSelectedStartupId] = useState("");
-    const [tasks, setTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
-
-    async function loadTasks(startupId) {
-        if (!startupId) return;
-        try {
-            const res = await api.get(`/task/get_tasks/${startupId}`);
-            setTasks(res.data);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    });
 
     useEffect(() => {
-        loadStartups();
-    }, []);
-
-    useEffect(() => {
-        loadTasks(selectedStartupId);
-    }, [selectedStartupId]);
-
-    async function moveTask(taskId, newStatus) {
-        if (newStatus === "Completed") {
-            try {
-                await api.patch(`/task/${taskId}/finish_task`);
-                showToast("Task completed!", "success");
-                loadTasks(selectedStartupId);
-            } catch (err) {
-                showToast("Failed to update task", "error");
-            }
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
         }
-    }
+    }, [startups, selectedStartupId]);
 
-    async function handleSelectTask(task) {
-        setSelectedTask(task);
-        try {
-            const res = await api.get(`/collaboration/tasks/${task.id}/comments`);
-            setComments(res.data);
-        } catch (err) {
-            console.error(err);
+    const { data: tasks = [] } = useQuery({
+        queryKey: ["tasks", selectedStartupId],
+        queryFn: async () => {
+            const res = await api.get(`/task/get_tasks/${selectedStartupId}`);
+            return res.data;
+        },
+        enabled: !!selectedStartupId
+    });
+
+    const { data: comments = [] } = useQuery({
+        queryKey: ["comments", selectedTask?.id],
+        queryFn: async () => {
+            const res = await api.get(`/collaboration/tasks/${selectedTask.id}/comments`);
+            return res.data;
+        },
+        enabled: !!selectedTask
+    });
+
+    const completeTaskMutation = useMutation({
+        mutationFn: async (taskId) => {
+            return await api.patch(`/task/${taskId}/finish_task`);
+        },
+        onSuccess: () => {
+            showToast("Task completed!", "success");
+            queryClient.invalidateQueries({ queryKey: ["tasks", selectedStartupId] });
+        },
+        onError: () => {
+            showToast("Failed to update task", "error");
         }
-    }
+    });
 
-    async function handleAddComment(e) {
-        e.preventDefault();
-        if (!newComment.trim() || !selectedTask) return;
-        try {
-            const res = await api.post(`/collaboration/tasks/${selectedTask.id}/comments`, { content: newComment });
-            setComments(prev => [...prev, res.data]);
+    const addCommentMutation = useMutation({
+        mutationFn: async ({ taskId, content }) => {
+            const res = await api.post(`/collaboration/tasks/${taskId}/comments`, { content });
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["comments", selectedTask?.id] });
             setNewComment("");
-        } catch (err) {
+        },
+        onError: () => {
             showToast("Failed to send comment", "error");
+        }
+    });
+
+    function moveTask(taskId, newStatus) {
+        if (newStatus === "Completed") {
+            completeTaskMutation.mutate(taskId);
+        }
+    }
+
+    function handleSelectTask(task) {
+        setSelectedTask(task);
+    }
+
+    function handleAddComment(e) {
+        e.preventDefault();
+        try {
+            commentSchema.parse({ content: newComment });
+            if (selectedTask) {
+                addCommentMutation.mutate({ taskId: selectedTask.id, content: newComment });
+            }
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                showToast(err.errors[0].message, "error");
+            }
         }
     }
 
@@ -93,9 +116,9 @@ function Kanban() {
                         </p>
                     </div>
                     <div>
-                        <select 
+                        <select
                             className="minimal-input py-2 px-3 cursor-pointer text-sm"
-                            value={selectedStartupId} 
+                            value={selectedStartupId}
                             onChange={(e) => setSelectedStartupId(e.target.value)}
                         >
                             {startups.map(s => (
@@ -113,17 +136,18 @@ function Kanban() {
                         </div>
                         <div className="flex flex-col gap-4 min-h-[300px]">
                             {pendingTasks.map(t => (
-                                <div 
-                                    key={t.id} 
+                                <div
+                                    key={t.id}
                                     onClick={() => handleSelectTask(t)}
                                     className="p-5 rounded-2xl border border-border bg-muted hover:border-border cursor-pointer transition-all duration-200"
                                 >
                                     <h3 className="font-bold text-sm text-foreground mb-4">{t.title}</h3>
-                                    <button 
+                                    <button
                                         onClick={(e) => { e.stopPropagation(); moveTask(t.id, "Completed"); }}
                                         className="btn-primary py-1.5 px-4 text-[10px] w-full"
+                                        disabled={completeTaskMutation.isPending && completeTaskMutation.variables === t.id}
                                     >
-                                        Complete
+                                        {completeTaskMutation.isPending && completeTaskMutation.variables === t.id ? "Completing..." : "Complete"}
                                     </button>
                                 </div>
                             ))}
@@ -137,8 +161,8 @@ function Kanban() {
                         </div>
                         <div className="flex flex-col gap-4 min-h-[300px]">
                             {completedTasks.map(t => (
-                                <div 
-                                    key={t.id} 
+                                <div
+                                    key={t.id}
                                     onClick={() => handleSelectTask(t)}
                                     className="p-5 rounded-2xl border border-border bg-muted opacity-70 hover:opacity-100 cursor-pointer transition-all duration-200"
                                 >
@@ -160,7 +184,7 @@ function Kanban() {
                                     </h3>
                                     <span className="text-[10px] text-muted-foreground font-semibold">Kanban comments</span>
                                 </div>
-                                <button 
+                                <button
                                     className="text-muted-foreground hover:text-muted-foreground text-lg cursor-pointer font-bold"
                                     onClick={() => setSelectedTask(null)}
                                 >
@@ -193,13 +217,14 @@ function Kanban() {
                                     className="flex-1 minimal-input py-2.5 px-3 text-xs"
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
+                                    disabled={addCommentMutation.isPending}
                                 />
                                 <button
                                     type="submit"
                                     className="btn-primary px-4 text-xs font-bold"
-                                    disabled={!newComment.trim()}
+                                    disabled={!newComment.trim() || addCommentMutation.isPending}
                                 >
-                                    Send
+                                    {addCommentMutation.isPending ? "Sending..." : "Send"}
                                 </button>
                             </form>
                         </div>

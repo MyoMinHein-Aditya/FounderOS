@@ -1,29 +1,46 @@
-import {useState} from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 
+const loginSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(1, "Password is required")
+});
 
-function Login(){
-    const [email,setEmail] = useState("");
-    const [password,setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-    async function login(){
-        try {
-            setLoading(true);
-            const res = await api.post("/auth/login",{email,password});
-            localStorage.setItem("token",res.data.access_token);
-            
-            // Fetch user profile to determine role
+    const loginMutation = useMutation({
+        mutationFn: async (credentials) => {
+            const res = await api.post("/auth/login", credentials);
+            return res.data;
+        },
+        onSuccess: async (data) => {
+            localStorage.setItem("token", data.access_token);
             const userRes = await api.get("/auth/me");
             if (userRes.data.role === "investor") {
                 window.location.href = "/investor";
             } else {
                 window.location.href = "/dashboard";
             }
-        } catch (err) {
+        },
+        onError: (err) => {
             alert(err.response?.data?.detail || "Login Failed");
-            setLoading(false);
+        }
+    });
+
+    function login() {
+        try {
+            const credentials = { email, password };
+            loginSchema.parse(credentials);
+            loginMutation.mutate(credentials);
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                alert(err.errors[0].message);
+            }
         }
     }
 
@@ -42,28 +59,28 @@ function Login(){
                 </header>
 
                 <div className="flex flex-col gap-4">
-                    <input 
+                    <input
                         className="minimal-input"
-                        placeholder="Email Address" 
+                        placeholder="Email Address"
                         type="email"
                         value={email}
-                        onChange={(e)=>setEmail(e.target.value)}
-                        disabled={loading}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loginMutation.isPending}
                     />
-                    <input 
+                    <input
                         className="minimal-input"
-                        placeholder="Password" 
+                        placeholder="Password"
                         type="password"
                         value={password}
-                        onChange={(e)=>setPassword(e.target.value)}
-                        disabled={loading}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loginMutation.isPending}
                     />
-                    <button 
-                        className="btn-primary w-full mt-2 font-bold text-base" 
+                    <button
+                        className="btn-primary w-full mt-2 font-bold text-base"
                         onClick={login}
-                        disabled={loading}
+                        disabled={loginMutation.isPending}
                     >
-                        {loading ? "Signing in..." : "Sign In"}
+                        {loginMutation.isPending ? "Signing in..." : "Sign In"}
                     </button>
                 </div>
 
@@ -75,7 +92,7 @@ function Login(){
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Login;

@@ -1,93 +1,110 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const leadSchema = z.object({
+    name: z.string().min(1, "Lead name is required"),
+    amount: z.number().min(0, "Amount must be a non-negative number"),
+    stage: z.string()
+});
+
 function CRM() {
     const { showToast } = useToast();
-    const [startups, setStartups] = useState([]);
+    const queryClient = useQueryClient();
+    
     const [selectedStartupId, setSelectedStartupId] = useState("");
-    const [leads, setLeads] = useState([]);
     const [name, setName] = useState("");
     const [amount, setAmount] = useState(0);
     const [stage, setStage] = useState("Lead");
-    const [isSaving, setIsSaving] = useState(false);
 
     const stages = ["Lead", "Contacted", "Term Sheet", "Closed"];
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
-
-    async function loadLeads(startupId) {
-        if (!startupId) return;
-        try {
-            const res = await api.get(`/crm/get_leads/${startupId}`);
-            setLeads(res.data);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    });
 
     useEffect(() => {
-        loadStartups();
-    }, []);
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
+        }
+    }, [startups, selectedStartupId]);
 
-    useEffect(() => {
-        loadLeads(selectedStartupId);
-    }, [selectedStartupId]);
+    const { data: leads = [] } = useQuery({
+        queryKey: ["leads", selectedStartupId],
+        queryFn: async () => {
+            const res = await api.get(`/crm/get_leads/${selectedStartupId}`);
+            return res.data;
+        },
+        enabled: !!selectedStartupId
+    });
 
-    async function handleAddLead() {
-        if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        if (!name.trim()) return showToast("Lead name is required", "warning");
-
-        setIsSaving(true);
-        try {
-            await api.post("/crm/create", {
-                startup_id: Number(selectedStartupId),
-                name,
-                stage,
-                amount: Number(amount)
-            });
+    const addLeadMutation = useMutation({
+        mutationFn: async (data) => {
+            await api.post("/crm/create", { ...data, startup_id: Number(selectedStartupId) });
+        },
+        onSuccess: () => {
             showToast("Lead added successfully!", "success");
             setName("");
             setAmount(0);
             setStage("Lead");
-            loadLeads(selectedStartupId);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["leads", selectedStartupId] });
+        },
+        onError: () => {
             showToast("Failed to add lead", "error");
-        } finally {
-            setIsSaving(false);
         }
-    }
+    });
 
-    async function handleMoveLead(leadId, newStage) {
-        try {
+    const moveLeadMutation = useMutation({
+        mutationFn: async ({ leadId, newStage }) => {
             await api.patch(`/crm/${leadId}/stage`, { stage: newStage });
+        },
+        onSuccess: () => {
             showToast("Lead pipeline stage updated", "success");
-            loadLeads(selectedStartupId);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["leads", selectedStartupId] });
+        },
+        onError: () => {
             showToast("Failed to update lead", "error");
         }
-    }
+    });
 
-    async function handleDeleteLead(leadId) {
-        if (!window.confirm("Delete this lead?")) return;
-        try {
+    const deleteLeadMutation = useMutation({
+        mutationFn: async (leadId) => {
             await api.delete(`/crm/${leadId}/delete`);
+        },
+        onSuccess: () => {
             showToast("Lead deleted", "success");
-            loadLeads(selectedStartupId);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["leads", selectedStartupId] });
+        },
+        onError: () => {
             showToast("Failed to delete lead", "error");
         }
+    });
+
+    function handleAddLead() {
+        if (!selectedStartupId) return showToast("Select a startup first", "warning");
+
+        const parsed = leadSchema.safeParse({ name, amount: Number(amount), stage });
+        if (!parsed.success) {
+            return showToast(parsed.error.errors[0].message, "warning");
+        }
+
+        addLeadMutation.mutate(parsed.data);
+    }
+
+    function handleMoveLead(leadId, newStage) {
+        moveLeadMutation.mutate({ leadId, newStage });
+    }
+
+    function handleDeleteLead(leadId) {
+        if (!window.confirm("Delete this lead?")) return;
+        deleteLeadMutation.mutate(leadId);
     }
 
     const totalPipeline = leads.reduce((acc, lead) => acc + lead.amount, 0);
@@ -151,9 +168,9 @@ function CRM() {
                             <button 
                                 className="btn-primary w-full font-bold mt-2"
                                 onClick={handleAddLead}
-                                disabled={isSaving}
+                                disabled={addLeadMutation.isPending}
                             >
-                                {isSaving ? "Adding..." : "Add Lead"}
+                                {addLeadMutation.isPending ? "Adding..." : "Add Lead"}
                             </button>
                         </div>
                     </section>

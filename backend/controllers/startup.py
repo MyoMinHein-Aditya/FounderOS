@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.dependencies import get_db
-from schemas.startup import StartupCreate
+from schemas.startup import StartupCreate, StartupResponse
 from utils.auth import get_current_user
 from services.startup_service import StartupService
 from agents.analyst_agent import analyst_agent
 from agents.strategy_agent import strategy_agent
 from repositories.startup import StartupRepository
+from typing import List
 
 class StartupController:
     def __init__(self):
         self.router = APIRouter(prefix="/startup", tags=["Startup"])
         self.router.add_api_route("/create", self.create_startup, methods=["POST"])
-        self.router.add_api_route("/get_startups", self.get_startups, methods=["GET"])
+        self.router.add_api_route("/get_startups", self.get_startups, methods=["GET"], response_model=List[StartupResponse])
         self.router.add_api_route("/{startup_id}/analyze", self.analyze_startup, methods=["GET"])
         self.router.add_api_route("/{startup_id}/strategy", self.strategy_startup, methods=["GET"])
 

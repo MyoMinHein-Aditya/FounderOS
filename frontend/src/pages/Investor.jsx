@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
@@ -7,45 +9,48 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 
+const investSchema = z.object({
+    amount: z.number().min(1, "Please enter a valid investment amount.")
+});
+
 function Investor() {
-    const [founders, setFounders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const queryClient = useQueryClient();
+    const { addToast } = useToast();
     const [selectedFounder, setSelectedFounder] = useState(null);
     const [investmentAmount, setInvestmentAmount] = useState(1000);
-    const { addToast } = useToast();
 
-    async function loadFounders() {
-        try {
-            setLoading(true);
+    const { data: founders = [], isLoading: loading, error: queryError } = useQuery({
+        queryKey: ["investorFounders"],
+        queryFn: async () => {
             const res = await api.get("/investor/founders");
-            setFounders(res.data.data);
-            setError(null);
-        } catch (err) {
-            console.error("Failed to load founders:", err);
-            setError("Unable to fetch startups. Are you an investor?");
-        } finally {
-            setLoading(false);
-        }
-    }
+            return res.data.data;
+        },
+    });
 
-    useEffect(() => {
-        loadFounders();
-    }, []);
+    const error = queryError ? "Unable to fetch startups. Are you an investor?" : null;
 
-    const handleInvest = async (startupId) => {
-        if (investmentAmount <= 0) {
-            addToast("Please enter a valid investment amount.", "error");
-            return;
-        }
-        try {
-            await api.post("/investor/invest", { startup_id: startupId, amount: investmentAmount });
+    const investMutation = useMutation({
+        mutationFn: async ({ startupId, amount }) => {
+            await api.post("/investor/invest", { startup_id: startupId, amount });
+        },
+        onSuccess: () => {
             addToast("Investment successfully recorded!", "success");
-            setSelectedFounder(null); // close modal after investing
-        } catch (err) {
+            setSelectedFounder(null);
+            queryClient.invalidateQueries({ queryKey: ["investorFounders"] });
+        },
+        onError: (err) => {
             console.error("Investment failed:", err);
             addToast(err.response?.data?.detail || "Investment failed", "error");
         }
+    });
+
+    const handleInvest = async (startupId) => {
+        const result = investSchema.safeParse({ amount: investmentAmount });
+        if (!result.success) {
+            addToast(result.error.errors[0].message, "error");
+            return;
+        }
+        investMutation.mutate({ startupId, amount: investmentAmount });
     };
 
     const openModal = (founder) => {

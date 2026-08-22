@@ -1,24 +1,46 @@
 import {useState} from "react";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 
+const registerSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    role: z.enum(["founder", "investor"])
+});
 
 function Register(){
     const[name,setName] = useState("");
     const[email,setEmail] = useState("");
     const[password,setPassword] = useState("");
     const[role,setRole] = useState("founder");
-    const [loading, setLoading] = useState(false);
+
+    const registerMutation = useMutation({
+        mutationFn: async (data) => {
+            const res = await api.post("/auth/register", data);
+            return res.data;
+        },
+        onSuccess: () => {
+            alert("Registration Successful. Please login.");
+            window.location.href="/";
+        },
+        onError: (err) => {
+            alert(err.response?.data?.detail || "Registration Failed");
+        }
+    });
+
+    const loading = registerMutation.isPending;
 
     async function register(){
         try {
-            setLoading(true);
-            await api.post("/auth/register",{name,email,password,role});
-            alert("Registration Successful. Please login.");
-            window.location.href="/";
+            const data = registerSchema.parse({ name, email, password, role });
+            registerMutation.mutate(data);
         } catch (err) {
-            alert(err.response?.data?.detail || "Registration Failed");
-            setLoading(false);
+            if (err instanceof z.ZodError) {
+                alert(err.errors[0].message);
+            }
         }
     }
 

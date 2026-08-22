@@ -1,53 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Card from "../components/Card";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
 function Dashboard() {
-    const [data, setData] = useState(null);
-    const [userName, setUserName] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const queryClient = useQueryClient();
 
-    async function loadStats() {
-        try {
-            setLoading(true);
+    const { data: statsData, isLoading: loading, error: statsError } = useQuery({
+        queryKey: ["dashboardStats"],
+        queryFn: async () => {
             const res = await api.get("/dashboard/get_stats");
-            setData(res.data);
-            setError(null);
-        } catch (err) {
-            console.error("Dashboard statistics loading failed:", err);
-            setError("Unable to sync database metrics. Ensure your backend is active and database is connected.");
-        } finally {
-            setLoading(false);
-        }
-    }
+            return res.data;
+        },
+    });
 
-    async function loadUser() {
-        try {
+    const { data: userData } = useQuery({
+        queryKey: ["authUser"],
+        queryFn: async () => {
             const res = await api.get("/auth/me");
-            setUserName(res.data.name);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+            return res.data;
+        },
+    });
 
-    useEffect(() => {
-        loadStats();
-        loadUser();
-    }, []);
-
-    async function finishTask(taskId) {
-        try {
+    const finishTaskMutation = useMutation({
+        mutationFn: async (taskId) => {
             await api.patch(`/task/${taskId}/finish_task`);
-            loadStats();
-        } catch (err) {
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
+        },
+        onError: (err) => {
             console.error("Task completion failed:", err);
         }
-    }
+    });
 
-    const stats = data || {
+    const finishTask = (taskId) => {
+        finishTaskMutation.mutate(taskId);
+    };
+
+    const error = statsError ? "Unable to sync database metrics. Ensure your backend is active and database is connected." : null;
+    const userName = userData?.name || "";
+
+    const stats = statsData || {
         total_startups: 0,
         total_goals: 0,
         completed_goals: 0,
@@ -66,13 +63,24 @@ function Dashboard() {
         <div className="min-h-screen bg-background text-foreground flex">
             <Navbar />
             <main className="flex-1 min-w-0 pt-24 px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full pb-12">
-                <header className="mb-10">
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
-                        Hey <span>{userName || "Founder"}</span>
-                    </h1>
-                    <p className="text-muted-foreground text-sm md:text-base font-medium">
-                        Here's your venture command center. Track progress, manage goals, and execute milestones.
-                    </p>
+                <header className="mb-10 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 font-heading">
+                            Hey <span>{userName || "Founder"}</span>
+                        </h1>
+                        <p className="text-muted-foreground text-sm md:text-base font-medium">
+                            Here's your venture command center. Track progress, manage goals, and execute milestones.
+                        </p>
+                    </div>
+                    <div>
+                        <a 
+                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/export/goals/csv`}
+                            className="btn-primary text-sm px-4 py-2"
+                            download
+                        >
+                            Export CSV
+                        </a>
+                    </div>
                 </header>
 
                 {error && (
@@ -80,7 +88,7 @@ function Dashboard() {
                         <span className="text-2xl" aria-hidden="true">⚠️</span>
                         <p className="text-sm font-semibold text-destructive max-w-md">{error}</p>
                         <button 
-                            onClick={loadStats}
+                            onClick={() => queryClient.invalidateQueries({ queryKey: ["dashboardStats"] })}
                             className="mt-2 btn-secondary text-xs"
                         >
                             Retry connection
@@ -195,8 +203,9 @@ function Dashboard() {
                                             </div>
                                         </div>
                                         <button 
-                                            className="btn-secondary text-xs ml-3 h-8 px-3"
+                                            className="btn-secondary text-xs ml-3 h-8 px-3 cursor-pointer disabled:opacity-50"
                                             onClick={() => finishTask(task.id)}
+                                            disabled={finishTaskMutation.isPending}
                                         >
                                             Complete
                                         </button>

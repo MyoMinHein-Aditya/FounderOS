@@ -1,76 +1,91 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const eventSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
+    date: z.string().min(1, "Date is required"),
+});
+
 function CalendarView() {
     const { showToast } = useToast();
-    const [startups, setStartups] = useState([]);
+    const queryClient = useQueryClient();
+
     const [selectedStartupId, setSelectedStartupId] = useState("");
-    const [events, setEvents] = useState([]);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
-
-    async function loadEvents(startupId) {
-        if (!startupId) return;
-        try {
-            const res = await api.get(`/calendar/get_events/${startupId}`);
-            setEvents(res.data);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    });
 
     useEffect(() => {
-        loadStartups();
-    }, []);
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
+        }
+    }, [startups, selectedStartupId]);
 
-    useEffect(() => {
-        loadEvents(selectedStartupId);
-    }, [selectedStartupId]);
+    const { data: events = [] } = useQuery({
+        queryKey: ["events", selectedStartupId],
+        queryFn: async () => {
+            const res = await api.get(`/calendar/get_events/${selectedStartupId}`);
+            return res.data;
+        },
+        enabled: !!selectedStartupId
+    });
 
-    async function handleAddEvent() {
-        if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        if (!title.trim() || !date) return showToast("Title and Date are required", "warning");
-
-        setIsSaving(true);
-        try {
-            await api.post("/calendar/create", { startup_id: Number(selectedStartupId), title, description, date });
+    const addEventMutation = useMutation({
+        mutationFn: async (data) => {
+            await api.post("/calendar/create", { ...data, startup_id: Number(selectedStartupId) });
+        },
+        onSuccess: () => {
             showToast("Event added to calendar", "success");
             setTitle("");
             setDescription("");
             setDate("");
-            loadEvents(selectedStartupId);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["events", selectedStartupId] });
+        },
+        onError: () => {
             showToast("Failed to add event", "error");
-        } finally {
-            setIsSaving(false);
         }
-    }
+    });
 
-    async function handleDeleteEvent(eventId) {
-        if (!window.confirm("Delete this event?")) return;
-        try {
+    const deleteEventMutation = useMutation({
+        mutationFn: async (eventId) => {
             await api.delete(`/calendar/${eventId}/delete`);
+        },
+        onSuccess: () => {
             showToast("Event deleted", "success");
-            loadEvents(selectedStartupId);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["events", selectedStartupId] });
+        },
+        onError: () => {
             showToast("Failed to delete event", "error");
         }
+    });
+
+    function handleAddEvent() {
+        if (!selectedStartupId) return showToast("Select a startup first", "warning");
+
+        const parsed = eventSchema.safeParse({ title, description, date });
+        if (!parsed.success) {
+            return showToast(parsed.error.errors[0].message, "warning");
+        }
+
+        addEventMutation.mutate(parsed.data);
+    }
+
+    function handleDeleteEvent(eventId) {
+        if (!window.confirm("Delete this event?")) return;
+        deleteEventMutation.mutate(eventId);
     }
 
     return (
@@ -125,9 +140,9 @@ function CalendarView() {
                             <button 
                                 className="btn-primary w-full font-bold mt-2"
                                 onClick={handleAddEvent}
-                                disabled={isSaving}
+                                disabled={addEventMutation.isPending}
                             >
-                                {isSaving ? "Adding..." : "Add Event"}
+                                {addEventMutation.isPending ? "Adding..." : "Add Event"}
                             </button>
                         </div>
                     </section>

@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Badge from "../components/Badge";
 import Navbar from "../components/Navbar";
 import Pagination from "../components/Pagination";
 import { useToast } from "../context/ToastContext";
 
+const createTaskSchema = z.object({
+    title: z.string().min(1, "Task title is required"),
+    startup_id: z.string().min(1, "Select a startup before creating a task."),
+    goal_id: z.string().min(1, "Select a goal before creating a task.")
+});
+
+const commentSchema = z.object({
+    content: z.string().min(1, "Comment cannot be empty")
+});
+
 function Tasks() {
+    const queryClient = useQueryClient();
     const { showToast } = useToast();
-    const [tasks, setTasks] = useState([]);
-    const [startups, setStartups] = useState([]);
-    const [goals, setGoals] = useState([]);
     const [form, setForm] = useState({ title: "", goal_id: "", startup_id: "" });
 
     // Search, Filters & Pagination States
@@ -23,37 +33,40 @@ function Tasks() {
     const [newComment, setNewComment] = useState("");
     const [ws, setWs] = useState(null);
 
-    async function loadStartups() {
-        const res = await api.get("/startup/get_startups");
-        setStartups(res.data);
-    }
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
+            const res = await api.get("/startup/get_startups");
+            return res.data;
+        }
+    });
 
-    async function loadGoals() {
-        const res = await api.get("/goal/get_my_goals");
-        setGoals(res.data);
-    }
+    const { data: goals = [] } = useQuery({
+        queryKey: ["goals"],
+        queryFn: async () => {
+            const res = await api.get("/goal/get_my_goals");
+            return res.data;
+        }
+    });
 
-    async function loadTasks(startupId, querySearch = search, queryStatus = statusFilter, queryPage = page) {
-        if (!startupId) return setTasks([]);
-        try {
-            const res = await api.get(`/task/get_tasks/${startupId}`, {
+    const { data: tasks = [] } = useQuery({
+        queryKey: ["tasks", form.startup_id, search, statusFilter, page],
+        queryFn: async () => {
+            if (!form.startup_id) return [];
+            const res = await api.get(`/task/get_tasks/${form.startup_id}`, {
                 params: {
-                    search: querySearch || undefined,
-                    status: queryStatus || undefined,
-                    page: queryPage,
+                    search: search || undefined,
+                    status: statusFilter || undefined,
+                    page: page,
                     limit: 6
                 }
             });
-            setTasks(res.data);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+            return res.data;
+        },
+        enabled: !!form.startup_id
+    });
 
     useEffect(() => {
-        loadStartups();
-        loadGoals();
-
         // Setup real-time WebSocket connection for activity ticker
         const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         const envUrl = import.meta.env.VITE_API_URL;
@@ -82,42 +95,52 @@ function Tasks() {
         return () => socket.close();
     }, []);
 
-    useEffect(() => {
-        if (form.startup_id) {
-            loadTasks(form.startup_id);
-        }
-    }, [search, statusFilter, page]);
-
-    async function createTask() {
-        if (!form.startup_id) return showToast("Select a startup before creating a task.", "warning");
-        if (!form.goal_id) return showToast("Select a goal before creating a task.", "warning");
-        if (!form.title.trim()) return showToast("Task title is required", "warning");
-
-        try {
+    const createTaskMutation = useMutation({
+        mutationFn: async (data) => {
             await api.post("/task/create", {
-                title: form.title,
-                startup_id: Number(form.startup_id),
-                goal_id: Number(form.goal_id)
+                title: data.title,
+                startup_id: Number(data.startup_id),
+                goal_id: Number(data.goal_id)
             });
+        },
+        onSuccess: () => {
             setForm({ ...form, title: "", goal_id: "" });
             showToast("Task created successfully", "success");
-            loadTasks(form.startup_id);
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["tasks", form.startup_id] });
+        },
+        onError: () => {
             showToast("Failed to create task", "error");
         }
+    });
+
+    async function createTask() {
+        const result = createTaskSchema.safeParse(form);
+        if (!result.success) {
+            showToast(result.error.errors[0].message, "warning");
+            return;
+        }
+        createTaskMutation.mutate(form);
     }
 
-    async function finishTask(taskId) {
-        try {
+    const finishTaskMutation = useMutation({
+        mutationFn: async (taskId) => {
             await api.patch(`/task/${taskId}/finish_task`);
+            return taskId;
+        },
+        onSuccess: (taskId) => {
             showToast("Task marked completed!", "success");
-            loadTasks(form.startup_id);
+            queryClient.invalidateQueries({ queryKey: ["tasks", form.startup_id] });
             if (selectedTask && selectedTask.id === taskId) {
                 setSelectedTask(prev => ({ ...prev, status: "Completed" }));
             }
-        } catch (err) {
+        },
+        onError: () => {
             showToast("Failed to complete task", "error");
         }
+    });
+
+    async function finishTask(taskId) {
+        finishTaskMutation.mutate(taskId);
     }
 
     async function handleSelectTask(task) {
@@ -130,15 +153,23 @@ function Tasks() {
         }
     }
 
-    async function handleAddComment(e) {
-        e.preventDefault();
-        if (!newComment.trim() || !selectedTask) return;
-        try {
-            await api.post(`/collaboration/tasks/${selectedTask.id}/comments`, { content: newComment });
+    const addCommentMutation = useMutation({
+        mutationFn: async (content) => {
+            await api.post(`/collaboration/tasks/${selectedTask.id}/comments`, { content });
+        },
+        onSuccess: () => {
             setNewComment("");
-        } catch (err) {
+        },
+        onError: () => {
             showToast("Failed to send comment", "error");
         }
+    });
+
+    async function handleAddComment(e) {
+        e.preventDefault();
+        const result = commentSchema.safeParse({ content: newComment });
+        if (!result.success || !selectedTask) return;
+        addCommentMutation.mutate(newComment);
     }
 
     const filteredGoals = goals.filter(g => g.startup_id === Number(form.startup_id));

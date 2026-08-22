@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const documentSchema = z.object({
+    content: z.string(),
+    type: z.string()
+});
+
 function Documents() {
     const { showToast } = useToast();
-    const [startups, setStartups] = useState([]);
+    const queryClient = useQueryClient();
+    
     const [selectedStartupId, setSelectedStartupId] = useState("");
     const [activeTab, setActiveTab] = useState("Canvas"); // Canvas, PRD, Pitch, Vision
     const [content, setContent] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
 
     const tabs = [
         { id: "Canvas", label: "Business Model Canvas" },
@@ -18,47 +25,55 @@ function Documents() {
         { id: "Vision", label: "Venture Vision" }
     ];
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
-
-    async function loadDocument(startupId, type) {
-        if (!startupId || !type) return;
-        try {
-            const res = await api.get(`/documents/get_document/${startupId}/${type}`);
-            setContent(res.data.content || "");
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    });
 
     useEffect(() => {
-        loadStartups();
-    }, []);
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
+        }
+    }, [startups, selectedStartupId]);
+
+    const { data: documentContent = "" } = useQuery({
+        queryKey: ["document", selectedStartupId, activeTab],
+        queryFn: async () => {
+            const res = await api.get(`/documents/get_document/${selectedStartupId}/${activeTab}`);
+            return res.data.content || "";
+        },
+        enabled: !!selectedStartupId && !!activeTab
+    });
 
     useEffect(() => {
-        loadDocument(selectedStartupId, activeTab);
-    }, [selectedStartupId, activeTab]);
+        setContent(documentContent);
+    }, [documentContent]);
 
-    async function handleSave() {
-        if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        setIsSaving(true);
-        try {
-            await api.post("/documents/save", { startup_id: Number(selectedStartupId), type: activeTab, content });
+    const saveMutation = useMutation({
+        mutationFn: async (data) => {
+            await api.post("/documents/save", { startup_id: Number(selectedStartupId), ...data });
+        },
+        onSuccess: () => {
             showToast("Document saved successfully", "success");
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ["document", selectedStartupId, activeTab] });
+        },
+        onError: () => {
             showToast("Failed to save document", "error");
-        } finally {
-            setIsSaving(false);
         }
+    });
+
+    function handleSave() {
+        if (!selectedStartupId) return showToast("Select a startup first", "warning");
+
+        const parsed = documentSchema.safeParse({ content, type: activeTab });
+        if (!parsed.success) {
+            return showToast("Invalid document data", "warning");
+        }
+
+        saveMutation.mutate(parsed.data);
     }
 
     return (
@@ -112,9 +127,9 @@ function Documents() {
                         <button 
                             className="btn-primary py-2.5 px-6 text-xs"
                             onClick={handleSave}
-                            disabled={isSaving}
+                            disabled={saveMutation.isPending}
                         >
-                            {isSaving ? "Saving..." : "Save Changes"}
+                            {saveMutation.isPending ? "Saving..." : "Save Changes"}
                         </button>
                     </div>
                     

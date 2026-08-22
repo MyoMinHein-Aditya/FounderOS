@@ -7,4 +7,5 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    role = Column(String, default="founder")
+    role = Column(String, default="founder")
+    current_workspace_id = Column(Integer, nullable=True)

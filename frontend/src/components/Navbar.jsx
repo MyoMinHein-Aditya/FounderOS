@@ -49,6 +49,20 @@ function Navbar(){
         loadUser();
         loadNotifications();
 
+        const wsUrl = import.meta.env.VITE_WS_URL || "ws://localhost:8000/ws";
+        const ws = new WebSocket(wsUrl);
+        ws.onmessage = (event) => {
+            // For now, just add simple real-time push to alerts list
+            try {
+                const data = JSON.parse(event.data);
+                if(data.message) {
+                    setNotifications(prev => [{id: Date.now(), message: data.message}, ...prev]);
+                }
+            } catch (err) {
+                // Not json or just echo
+            }
+        };
+
         function handleClickOutside(event) {
             if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
                 const triggerButton = document.getElementById("sidebar-trigger");
@@ -70,6 +84,7 @@ function Navbar(){
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             window.removeEventListener("open-notifications", handleOpenNotifications);
+            ws.close();
         };
     }, []);
 
@@ -87,6 +102,7 @@ function Navbar(){
         { path: "/whiteboard", label: "Whiteboard" },
         { path: "/team", label: "Team" },
         { path: "/ai", label: "AI Assistant" },
+        { path: "/audit", label: "Audit Log" },
         { path: "/settings", label: "Settings" }
     ];
 
@@ -235,6 +251,27 @@ function Navbar(){
                             </div>
                         </div>
                     )}
+                    
+                    <div className="px-2 mt-2">
+                        <label className="text-xs text-muted-foreground mb-1 block">Workspace</label>
+                        <select 
+                            className="w-full bg-muted border border-border rounded text-sm p-2 text-foreground"
+                            value={user?.current_workspace_id || 1}
+                            onChange={async (e) => {
+                                const newId = e.target.value;
+                                try {
+                                    await api.post(`/auth/workspace/${newId}`);
+                                    window.location.reload();
+                                } catch(err) {
+                                    console.error(err);
+                                }
+                            }}
+                        >
+                            <option value={1}>Personal Workspace</option>
+                            <option value={2}>Acme Corp</option>
+                            <option value={3}>Global Ventures</option>
+                        </select>
+                    </div>
                     
                     <button 
                         className="nav-item justify-start w-full cursor-pointer mt-2" 

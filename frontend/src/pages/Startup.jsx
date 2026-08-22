@@ -1,34 +1,64 @@
-import {useState, useEffect} from "react";
+import {useState} from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Badge from "../components/Badge";
 import ProgressBar from "../components/ProgressBar";
 import Navbar from "../components/Navbar";
 
+const startupSchema = z.object({
+    name: z.string().min(1, "Startup Name is required"),
+    description: z.string(),
+    stage: z.string(),
+    industry: z.string(),
+});
 
 function Startup(){
-    const [startups, setStartups] = useState([]);
     const [form, setForm] = useState({name:"", description:"", stage:"", industry:""});
-    const [stats, setStats] = useState({});
     const [modal, setModal] = useState({ isOpen: false, title: "", content: "", loading: false });
+    const queryClient = useQueryClient();
     
-    async function loadStartups(){
-        const res = await api.get("/startup/get_startups");
-        setStartups(res.data);
-        
-        const dashRes = await api.get("/dashboard/get_stats");
-        setStats(dashRes.data);
-    }
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
+            const res = await api.get("/startup/get_startups");
+            return res.data;
+        }
+    });
 
-    useEffect(() => {
-        loadStartups();
-    }, []);
+    const { data: stats = {} } = useQuery({
+        queryKey: ["stats"],
+        queryFn: async () => {
+            const dashRes = await api.get("/dashboard/get_stats");
+            return dashRes.data;
+        }
+    });
+
+    const createStartupMutation = useMutation({
+        mutationFn: async (data) => {
+            const res = await api.post("/startup/create", data);
+            return res.data;
+        },
+        onSuccess: () => {
+            alert("Startup Created.");
+            setForm({name:"", description:"", stage:"", industry:""});
+            queryClient.invalidateQueries({ queryKey: ["startups"] });
+            queryClient.invalidateQueries({ queryKey: ["stats"] });
+        },
+        onError: () => {
+            alert("Failed to create startup.");
+        }
+    });
 
     async function createStartup(){
-        if(!form.name) return alert("Startup Name is required.");
-        await api.post("/startup/create", form);
-        alert("Startup Created.");
-        setForm({name:"", description:"", stage:"", industry:""});
-        loadStartups();
+        try {
+            const data = startupSchema.parse(form);
+            createStartupMutation.mutate(data);
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                alert(err.errors[0].message);
+            }
+        }
     }
 
     async function handleAnalyze(startupId, type) {

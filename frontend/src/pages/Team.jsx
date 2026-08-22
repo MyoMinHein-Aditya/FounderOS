@@ -1,69 +1,94 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const teamSchema = z.object({
+    name: z.string().min(1, "Team name is required")
+});
+
+const inviteSchema = z.object({
+    email: z.string().email("Invalid email address")
+});
+
 function Team() {
     const { showToast } = useToast();
-    const [team, setTeam] = useState(null);
-    const [members, setMembers] = useState([]);
+    const queryClient = useQueryClient();
     const [teamName, setTeamName] = useState("");
     const [inviteEmail, setInviteEmail] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
 
-    async function loadTeam() {
-        try {
+    const { data: team } = useQuery({
+        queryKey: ["team"],
+        queryFn: async () => {
             const res = await api.get("/collaboration/teams/my_team");
-            setTeam(res.data);
-            if (res.data) {
-                loadMembers(res.data.id);
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data || null; // fallback to null if empty string
         }
-    }
+    });
 
-    async function loadMembers(teamId) {
-        try {
-            const res = await api.get(`/collaboration/teams/${teamId}/members`);
-            setMembers(res.data);
-        } catch (err) {
-            console.error(err);
+    const { data: members = [] } = useQuery({
+        queryKey: ["teamMembers", team?.id],
+        queryFn: async () => {
+            if (!team?.id) return [];
+            const res = await api.get(`/collaboration/teams/${team.id}/members`);
+            return res.data;
+        },
+        enabled: !!team?.id
+    });
+
+    const createTeamMutation = useMutation({
+        mutationFn: async (data) => {
+            const res = await api.post("/collaboration/teams/create", data);
+            return res.data;
+        },
+        onSuccess: () => {
+            showToast("Team created successfully!", "success");
+            queryClient.invalidateQueries({ queryKey: ["team"] });
+        },
+        onError: () => {
+            showToast("Failed to create team", "error");
         }
-    }
+    });
+
+    const inviteMemberMutation = useMutation({
+        mutationFn: async (data) => {
+            const res = await api.post(`/collaboration/teams/${team.id}/add_member`, { email: data.email, role: "Member" });
+            return res.data;
+        },
+        onSuccess: () => {
+            showToast("Teammate added successfully!", "success");
+            setInviteEmail("");
+            queryClient.invalidateQueries({ queryKey: ["teamMembers", team.id] });
+        },
+        onError: () => {
+            showToast("Failed to add teammate. Ensure they are registered.", "error");
+        }
+    });
 
     async function handleCreateTeam() {
-        if (!teamName.trim()) return showToast("Team name is required", "warning");
-        setIsSaving(true);
         try {
-            await api.post("/collaboration/teams/create", { name: teamName });
-            showToast("Team created successfully!", "success");
-            loadTeam();
+            const data = teamSchema.parse({ name: teamName });
+            createTeamMutation.mutate(data);
         } catch (err) {
-            showToast("Failed to create team", "error");
-        } finally {
-            setIsSaving(false);
+            if (err instanceof z.ZodError) {
+                showToast(err.errors[0].message, "warning");
+            }
         }
     }
 
     async function handleInviteMember() {
-        if (!inviteEmail.trim()) return showToast("Email address is required", "warning");
-        setIsSaving(true);
         try {
-            await api.post(`/collaboration/teams/${team.id}/add_member`, { email: inviteEmail, role: "Member" });
-            showToast("Teammate added successfully!", "success");
-            setInviteEmail("");
-            loadMembers(team.id);
+            const data = inviteSchema.parse({ email: inviteEmail });
+            inviteMemberMutation.mutate(data);
         } catch (err) {
-            showToast("Failed to add teammate. Ensure they are registered.", "error");
-        } finally {
-            setIsSaving(false);
+            if (err instanceof z.ZodError) {
+                showToast(err.errors[0].message, "warning");
+            }
         }
     }
 
-    useEffect(() => {
-        loadTeam();
-    }, []);
+    const isSaving = createTeamMutation.isPending || inviteMemberMutation.isPending;
 
     return (
         <div className="min-h-screen bg-background text-foreground flex">

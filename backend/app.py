@@ -18,6 +18,7 @@ import models.team
 import models.team_member
 import models.comment
 import models.crm
+import models.audit_log
 
 from controllers.auth import router as auth_router
 from controllers.startup import router as startup_router
@@ -89,6 +90,16 @@ def db_test():
     finally:
         db.close()
 
+from config import get_settings
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
+
+settings = get_settings()
+
+from controllers.audit_log import router as audit_log_router
+from controllers.export import router as export_router
+
 app.include_router(auth_router, tags=["Authentication"])
 app.include_router(startup_router, tags=["Startup"])
 app.include_router(goal_router, tags=["Goals"])
@@ -104,5 +115,30 @@ app.include_router(collaboration_router, tags=["Collaboration"])
 app.include_router(ai_features_router, tags=["AI Workspace"])
 app.include_router(crm_router, tags=["CRM"])
 app.include_router(investor_router, tags=["Investor"])
+app.include_router(export_router, tags=["Export"])
+app.include_router(audit_log_router, tags=["Audit Log"])
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
+# Global Exception Handlers
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Database error occurred", "type": "DatabaseError"},
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors(), "type": "ValidationError"},
+    )
+
+origins = ["*"] if settings.ENVIRONMENT == "dev" else ["https://yourproductiondomain.com"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)

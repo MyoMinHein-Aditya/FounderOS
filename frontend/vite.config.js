@@ -5,4 +5,9 @@ import founderBrainPlugin from './plugins/vite-plugin-brain/index.js'
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), founderBrainPlugin()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/setupTests.js'
+  }
 })

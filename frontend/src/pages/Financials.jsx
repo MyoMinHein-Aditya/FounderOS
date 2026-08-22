@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 
+const financialsSchema = z.object({
+    cash: z.number().min(0, "Cash cannot be negative"),
+    mrr: z.number().min(0, "MRR cannot be negative"),
+    burn: z.number().min(0, "Burn cannot be negative"),
+    cac: z.number().min(0, "CAC cannot be negative"),
+    ltv: z.number().min(0, "LTV cannot be negative")
+});
+
 function Financials() {
     const { showToast } = useToast();
-    const [startups, setStartups] = useState([]);
+    const queryClient = useQueryClient();
+    
     const [selectedStartupId, setSelectedStartupId] = useState("");
     
     // Financial inputs
@@ -14,7 +25,6 @@ function Financials() {
     const [burn, setBurn] = useState(12000);
     const [cac, setCac] = useState(150);
     const [ltv, setLtv] = useState(900);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [aiFeedback, setAiFeedback] = useState("");
 
     // Helper to format raw markdown into beautiful React elements
@@ -65,40 +75,49 @@ function Financials() {
         });
     }
 
-    async function loadStartups() {
-        try {
+    const { data: startups = [] } = useQuery({
+        queryKey: ["startups"],
+        queryFn: async () => {
             const res = await api.get("/startup/get_startups");
-            setStartups(res.data);
-            if (res.data.length > 0) {
-                setSelectedStartupId(res.data[0].id.toString());
-            }
-        } catch (err) {
-            console.error(err);
+            return res.data;
         }
-    }
+    });
 
     useEffect(() => {
-        loadStartups();
-    }, []);
+        if (startups.length > 0 && !selectedStartupId) {
+            setSelectedStartupId(startups[0].id.toString());
+        }
+    }, [startups, selectedStartupId]);
 
     const runway = burn > 0 ? (cash / burn).toFixed(1) : "Unlimited";
     const ltvCacRatio = cac > 0 ? (ltv / cac).toFixed(1) : "0";
 
-    async function handleRunAIAnalysis() {
-        if (!selectedStartupId) return showToast("Select a startup first", "warning");
-        setIsAnalyzing(true);
-        try {
-            const metricsText = `Cash: $${cash}, MRR: $${mrr}, Burn Rate: $${burn}, CAC: $${cac}, LTV: $${ltv}`;
+    const analyzeMutation = useMutation({
+        mutationFn: async (metricsText) => {
             const res = await api.post(`/ai-features/analyst/${selectedStartupId}`, null, {
                 params: { metrics_data: metricsText }
             });
-            setAiFeedback(res.data.analysis);
+            return res.data;
+        },
+        onSuccess: (data) => {
+            setAiFeedback(data.analysis);
             showToast("AI financial analysis completed!", "success");
-        } catch (err) {
+        },
+        onError: () => {
             showToast("Failed to compile AI analysis", "error");
-        } finally {
-            setIsAnalyzing(false);
         }
+    });
+
+    function handleRunAIAnalysis() {
+        if (!selectedStartupId) return showToast("Select a startup first", "warning");
+
+        const parsed = financialsSchema.safeParse({ cash: Number(cash), mrr: Number(mrr), burn: Number(burn), cac: Number(cac), ltv: Number(ltv) });
+        if (!parsed.success) {
+            return showToast(parsed.error.errors[0].message, "warning");
+        }
+
+        const metricsText = `Cash: $${cash}, MRR: $${mrr}, Burn Rate: $${burn}, CAC: $${cac}, LTV: $${ltv}`;
+        analyzeMutation.mutate(metricsText);
     }
 
     return (
@@ -207,13 +226,13 @@ function Financials() {
                         <button 
                             className="btn-primary py-2 px-5 text-xs"
                             onClick={handleRunAIAnalysis}
-                            disabled={isAnalyzing}
+                            disabled={analyzeMutation.isPending}
                         >
-                            {isAnalyzing ? "Analyzing..." : "Generate report"}
+                            {analyzeMutation.isPending ? "Analyzing..." : "Generate report"}
                         </button>
                     </div>
                     <div className="bg-muted p-5 rounded-xl border border-border text-sm leading-relaxed text-muted-foreground font-mono">
-                        {isAnalyzing ? (
+                        {analyzeMutation.isPending ? (
                             <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                                 <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-2"></div>
                                 <p className="animate-pulse text-xs">Computing MRR & cash projections...</p>

@@ -26,30 +26,32 @@ import Financials from "./pages/Financials";
 import CRM from "./pages/CRM";
 import Whiteboard from "./pages/Whiteboard";
 import Investor from "./pages/Investor";
+import AuditLog from "./pages/AuditLog";
 
 const BrainOverlay = import.meta.env.DEV ? lazy(() => import("../devtools/brain/BrainOverlay")) : () => null;
 
 // Protecting routes with authentication check
 
+import { useQuery } from '@tanstack/react-query';
+
 function AuthCheck({ children }) {
-  const [authorized, setAuthorized] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setAuthorized(false);
-      return;
-    }
-    
-    api.get("/auth/me")
-      .then(() => setAuthorized(true))
-      .catch(() => {
+  const { isLoading, isError, isSuccess } = useQuery({
+    queryKey: ['authMe'],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token");
+      try {
+        await api.get("/auth/me");
+        return true;
+      } catch (error) {
         localStorage.removeItem("token");
-        setAuthorized(false);
-      });
-  }, []);
+        throw error;
+      }
+    },
+    retry: false,
+  });
 
-  if (authorized === null) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center text-muted-foreground">
         <div className="w-8 h-8 border-4 border-t-white border-border rounded-full animate-spin mb-4"></div>
@@ -58,11 +60,11 @@ function AuthCheck({ children }) {
     );
   }
 
-  if (authorized === false) {
+  if (isError) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return isSuccess ? children : null;
 }
 
 function App(){
@@ -88,6 +90,7 @@ function App(){
             <Route path="/crm" element={<AuthCheck><CRM/></AuthCheck>}/>
             <Route path="/whiteboard" element={<AuthCheck><Whiteboard/></AuthCheck>}/>
             <Route path="/investor" element={<AuthCheck><Investor/></AuthCheck>}/>
+            <Route path="/audit" element={<AuthCheck><AuditLog/></AuthCheck>}/>
           </Routes>
           <Suspense fallback={null}>
             {import.meta.env.DEV && <BrainOverlay />}

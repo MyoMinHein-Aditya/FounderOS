@@ -4,11 +4,14 @@ from models.startup import Startup
 from schemas.goal import GoalCreate
 from fastapi import HTTPException
 from repositories.goal import GoalRepository
+from services.audit_log_service import AuditLogService
+from repositories.audit_log import AuditLogRepository
 
 class GoalService:
     def __init__(self, repo: GoalRepository, db: Session):
         self.repo = repo
         self.db = db
+        self.audit_service = AuditLogService(AuditLogRepository(db), db)
 
     def create(self, data: GoalCreate, owner_id: int) -> Goal:
         startup = self.db.query(Startup).filter(Startup.id == data.startup_id, Startup.owner_id == owner_id).first()
@@ -20,7 +23,9 @@ class GoalService:
             description=data.description,
             startup_id=data.startup_id
         )
-        return self.repo.create(goal)
+        created_goal = self.repo.create(goal)
+        self.audit_service.log_action(owner_id, "CREATE_GOAL", "Goal", created_goal.id)
+        return created_goal
 
     def get_all_by_owner(self, owner_id: int, search: str = None, status: str = None, page: int = 1, limit: int = 10) -> list:
         query = self.db.query(Goal).join(Startup).filter(Startup.owner_id == owner_id)
@@ -36,4 +41,5 @@ class GoalService:
             raise HTTPException(status_code=404, detail="Goal not found")
         goal.status = "Completed"
         self.db.commit()
+        self.audit_service.log_action(owner_id, "COMPLETE_GOAL", "Goal", goal.id)
         return True

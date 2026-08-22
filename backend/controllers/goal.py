@@ -1,16 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.dependencies import get_db
-from schemas.goal import GoalCreate
+from schemas.goal import GoalCreate, GoalResponse
 from utils.auth import get_current_user
 from services.goal_service import GoalService
 from repositories.goal import GoalRepository
+from typing import List
 
 class GoalController:
     def __init__(self):
         self.router = APIRouter(prefix="/goal", tags=["Goals"])
         self.router.add_api_route("/create", self.create_goal, methods=["POST"])
-        self.router.add_api_route("/get_my_goals", self.get_my_goals, methods=["GET"])
+        self.router.add_api_route("/get_my_goals", self.get_my_goals, methods=["GET"], response_model=List[GoalResponse])
         self.router.add_api_route("/{goal_id}/finish_goal", self.finish_goal, methods=["PATCH"])
 
     def _get_service(self, db: Session) -> GoalService:
