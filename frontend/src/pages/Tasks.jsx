@@ -31,7 +31,6 @@ function Tasks() {
     const [selectedTask, setSelectedTask] = useState(null);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [ws, setWs] = useState(null);
 
     const { data: startups = [] } = useQuery({
         queryKey: ["startups"],
@@ -86,12 +85,11 @@ function Tasks() {
                         return current;
                     });
                 }
-            } catch (err) {
-                // Ignore test text echo messages
+            } catch {
+                // Ignore parsing errors
             }
         };
 
-        setWs(socket);
         return () => socket.close();
     }, []);
 
@@ -199,7 +197,6 @@ function Tasks() {
                                     onChange={(e) => {
                                         setForm({ ...form, startup_id: e.target.value, goal_id: "" });
                                         setPage(1);
-                                        loadTasks(e.target.value, search, statusFilter, 1);
                                     }}
                                 >
                                     <option value="" className="bg-background text-muted-foreground">Select Startup</option>

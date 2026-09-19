@@ -1,3 +1,5 @@
+import React from 'react';
+
 function Badge({ status, label, icon }) {
     const badgeStyles = {
         completed: "bg-primary/10 text-primary border-primary/20",

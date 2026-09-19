@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
 import { X } from "lucide-react";
 import { 
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 
 const investSchema = z.object({

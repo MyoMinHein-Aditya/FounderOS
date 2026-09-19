@@ -15,8 +15,6 @@ const financialsSchema = z.object({
 
 function Financials() {
     const { showToast } = useToast();
-    const queryClient = useQueryClient();
-    
     const [selectedStartupId, setSelectedStartupId] = useState("");
     
     // Financial inputs

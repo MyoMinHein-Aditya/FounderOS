@@ -26,13 +26,6 @@ function Startup(){
         }
     });
 
-    const { data: stats = {} } = useQuery({
-        queryKey: ["stats"],
-        queryFn: async () => {
-            const dashRes = await api.get("/dashboard/get_stats");
-            return dashRes.data;
-        }
-    });
 
     const createStartupMutation = useMutation({
         mutationFn: async (data) => {
