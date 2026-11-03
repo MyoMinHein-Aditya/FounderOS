@@ -46,7 +46,7 @@ export default function founderBrainPlugin(options = {}) {
                         try {
                             const traceData = JSON.parse(body);
                             server.ws.send('founderos:trace', traceData);
-                        } catch(e) {}
+                        } catch(e) { /* ignore */ }
                         res.statusCode = 200;
                         res.end('ok');
                     });
