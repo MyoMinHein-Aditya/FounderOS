@@ -26,51 +26,51 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* Dark mode first */
+/* Default (Cream / Ink Black / Burnt Orange) */
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #09090b;
-  --card-foreground: #fafafa;
-  --popover: #09090b;
-  --popover-foreground: #fafafa;
-  --primary: #5B5FEF;
+  --background: #F3EEE3;
+  --foreground: #111111;
+  --card: #EDE8DC;
+  --card-foreground: #111111;
+  --popover: #EDE8DC;
+  --popover-foreground: #111111;
+  --primary: #D9541E;
   --primary-foreground: #ffffff;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #7C3AED;
+  --secondary: #E6E0D2;
+  --secondary-foreground: #111111;
+  --muted: #E6E0D2;
+  --muted-foreground: #6B6353;
+  --accent: #D9541E;
   --accent-foreground: #ffffff;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #5B5FEF;
+  --destructive: #B91C1C;
+  --destructive-foreground: #ffffff;
+  --border: #D6CFC0;
+  --input: #D6CFC0;
+  --ring: #D9541E;
   --radius: 0.5rem;
 }
 
-/* Light mode overrides */
+/* Dark mode overrides */
 html.light {
-  --background: #ffffff;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #5B5FEF;
+  --background: #F3EEE3;
+  --foreground: #111111;
+  --card: #EDE8DC;
+  --card-foreground: #111111;
+  --popover: #EDE8DC;
+  --popover-foreground: #111111;
+  --primary: #D9541E;
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #7C3AED;
+  --secondary: #E6E0D2;
+  --secondary-foreground: #111111;
+  --muted: #E6E0D2;
+  --muted-foreground: #6B6353;
+  --accent: #D9541E;
   --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #5B5FEF;
+  --destructive: #B91C1C;
+  --destructive-foreground: #ffffff;
+  --border: #D6CFC0;
+  --input: #D6CFC0;
+  --ring: #D9541E;
 }
 
 @layer base {
